@@ -37,6 +37,24 @@ class IvyMirrorSuite extends munit.FunSuite {
     )
   }
 
+  test("file mirrors read literal port percent and space cache names") {
+    val directory = java.nio.file.Files.createTempDirectory("ivy mirror ").toFile
+    try {
+      val mirror = directory.toURI.toString
+      val urls = Seq("http://localhost:8080/repo/a.pom", "https://example.org/a%20b/c%25.pom", "https://example.org/a b/c.pom")
+      urls.foreach { original =>
+        val cached = new java.io.File(directory, CachePaths.relativePath(original))
+        cached.getParentFile.mkdirs()
+        java.nio.file.Files.write(cached.toPath, original.getBytes("UTF-8"))
+        val rewritten = IvyMirror.rewritePrefix(original, mirror).get
+        val input = new java.net.URL(rewritten).openStream()
+        val actual = try scala.io.Source.fromInputStream(input, "UTF-8").mkString finally input.close()
+        assertEquals(actual, original)
+        assertEquals(IvyMirror.unrewritePrefix(rewritten, mirror), original)
+      }
+    } finally LockGeneration.deleteRecursively(directory)
+  }
+
   test("the local repository stays in the user's Ivy home") {
     val local = Resolver.defaultLocal
     val pinned = IvyMirror.pinIvyHome(local, new java.io.File("/home/user/.ivy2")).asInstanceOf[sbt.librarymanagement.FileRepository]
