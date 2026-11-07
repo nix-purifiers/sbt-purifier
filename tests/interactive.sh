@@ -98,7 +98,14 @@ interactive_suite() {
   use_fixture "$fixture"
 
   echo "== $fixture: interactive build with the network cut off"
-  output=$(run_sbt compile app/test "$run") || fail "$fixture: the offline build failed"
+  output=$(run_sbt compile app/test "$run") || {
+    local native_exit=$?
+    if [[ $fixture == metameta ]]; then
+      printf 'metameta: compile app/test %s exited with status %s\n%s\n' \
+        "$run" "$native_exit" "$output" >&2
+    fi
+    fail "$fixture: the offline build failed"
+  }
   for line in "$@"; do expect "$fixture: the output has $line" has "$line"; done
   expect "$fixture: the tests run" has 'Passed: Total [1-9]'
   # An editor's build server resolves the sources of every dependency
