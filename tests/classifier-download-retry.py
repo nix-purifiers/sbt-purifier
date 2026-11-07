@@ -12,6 +12,7 @@ import shutil
 import ssl
 import subprocess
 import threading
+import time
 import zipfile
 
 
@@ -44,7 +45,7 @@ def main():
             artifacts[path + suffix] = hashlib.new(algorithm, body).hexdigest().encode()
     target = '/owned/classifier/dependency/1.0.0/dependency-1.0.0-sources.jar'
     other = '/owned/classifier/other/1.0.0/other-1.0.0-sources.jar'
-    state = {'scenario': 'baseline', 'requests': Counter()}
+    state = {'scenario': 'baseline', 'requests': Counter(), 'targetTimes': []}
     state_lock = threading.Lock()
 
     class Handler(BaseHTTPRequestHandler):
@@ -62,6 +63,8 @@ def main():
                 state['requests'][(self.command, self.path)] += 1
                 count = state['requests'][(self.command, self.path)]
                 scenario = state['scenario']
+                if self.command == 'GET' and self.path == target:
+                    state['targetTimes'].append(time.monotonic())
             body = artifacts.get(self.path)
             status = 200 if body is not None else 404
             body = body or b'not found'
@@ -162,7 +165,12 @@ updateClassifiers := {
         '-Duser.home=' + env['HOME'] + ' -Djava.io.tmpdir=' + str(temporary) +
         ' -Dsbt.global.base=' + str(results / 'global') + ' -Dsbt.ivy.home=' + str(results / 'ivy') +
         ' -Dsbt.boot.directory=' + str(results / 'boot'))
+    source = Path(__file__).resolve().parents[1]
+    source_revision = subprocess.check_output(['git', '-C', str(source), 'rev-parse', 'HEAD'], text=True).strip()
+    assert not subprocess.check_output(['git', '-C', str(source), 'status', '--porcelain']), 'capture requires a frozen clean source'
     receipt = {'sbtVersion': args.sbt_version, 'wrapper': str(args.wrapper.resolve()),
+        'sourceRevision': source_revision,
+        'wrapperScriptSha256': hashlib.sha256((args.wrapper / 'bin/sbt').read_bytes()).hexdigest(),
         'harnessSha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         'bootstrap': 'Backend disabled only in parent; actual capture resets mode and starts empty HOME/cache. No Maven Central mirror configured.',
         'repository': 'Owned Maven test artifacts; default native SDK repositories unchanged.',
@@ -180,6 +188,7 @@ updateClassifiers := {
             with state_lock:
                 state['scenario'] = scenario
                 state['requests'] = Counter()
+                state['targetTimes'] = []
             counter.write_text('')
             case_env = dict(env)
             if scenario == 'fatal':
@@ -197,9 +206,11 @@ updateClassifiers := {
             with state_lock:
                 requests = [{'method': method, 'path': path, 'count': count}
                     for (method, path), count in sorted(state['requests'].items())]
+                times = list(state['targetTimes'])
             case.update(returncode=process.returncode, projectTaskCounts=dict(counts), requests=requests,
                 classifierRetryWarnings=text.count('transient classifier download failed; retry'),
-                freshCapture='in a fresh sbt with an empty cache' in text)
+                freshCapture='in a fresh sbt with an empty cache' in text,
+                targetGetOffsets=[round(value - times[0], 6) for value in times])
             save()
             assert (process.returncode == 0) == case['expectedSuccess'], scenario + ': unexpected native result; see ' + label
             assert case['freshCapture'], 'case did not reach a fresh native capture'
@@ -220,15 +231,27 @@ updateClassifiers := {
                 assert counts == baseline_counts, 'classifier retry reran a project task'
                 assert case['classifierRetryWarnings'] >= 1
                 assert next(row['count'] for row in requests if row['method'] == 'GET' and row['path'] == target) == 2
+                assert times[1] - times[0] >= 0.9, 'native retry did not observe its first backoff'
             else:
                 assert before == baseline and lockfile.read_bytes() == baseline, 'failed capture changed old lock bytes'
                 assert not counts, 'failed editor downloads executed project compile/test/package/publish'
                 assert 'wrote sbt-purifier.lock.json' not in text
+                assert 'LockGeneration$LockFailed' in text, 'failure did not come from native capture'
                 if scenario == 'exhausted503':
                     assert next(row['count'] for row in requests if row['method'] == 'GET' and row['path'] == target) == 3
                     assert case['classifierRetryWarnings'] == 2
+                    assert times[1] - times[0] >= 0.9 and times[2] - times[1] >= 1.9
                 else:
                     assert case['classifierRetryWarnings'] == 0, 'hard failure retried a classifier task'
+                    markers = {
+                        'mixed503401': [target, other, 'ArtifactError$Unauthorized', '503 for URL:'],
+                        'checksum': [target, 'ArtifactError$WrongChecksum'],
+                        'truncated': [target, 'ArtifactError$WrongChecksum'],
+                        'tls': [target, 'javax.net.ssl.SSLHandshakeException'],
+                        'fatal': ['owned fatal classifier override'],
+                    }[scenario]
+                    assert all(marker in text for marker in markers), 'negative failed for an unrelated reason'
+                    case['expectedNativeFailureMarkers'] = markers
             case['oldLockPreserved'] = baseline is not None and lockfile.read_bytes() == baseline
             case['lockSha256'] = hashlib.sha256(lockfile.read_bytes()).hexdigest()
             case['passed'] = True
