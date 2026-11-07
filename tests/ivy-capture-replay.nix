@@ -1,4 +1,8 @@
-{ producerSource, projectSource, lockFile }:
+{
+  producerSource,
+  projectSource,
+  lockFile,
+}:
 let
   f = builtins.getFlake (toString producerSource);
   pkgs = import f.inputs.nixpkgs {
@@ -10,7 +14,8 @@ let
     inherit lockFile;
     doCheck = true;
   };
-in {
+in
+{
   inherit (build) tests dependencies;
   app = build.packages.app;
 }
