@@ -243,8 +243,13 @@ updateClassifiers := {
                     assert times[1] - times[0] >= 0.9 and times[2] - times[1] >= 1.9
                 else:
                     assert case['classifierRetryWarnings'] == 0, 'hard failure retried a classifier task'
+                    target_url = 'http://127.0.0.1:' + str(server.server_port) + target
+                    other_url = 'http://127.0.0.1:' + str(server.server_port) + other
                     markers = {
-                        'mixed503401': [target, other, 'ArtifactError$Unauthorized', '503 for URL:'],
+                        # Coursier chains only the first error, whose order may
+                        # vary. Verify both complete native URL/error entries.
+                        'mixed503401': [other_url + ': unauthorized: ' + other_url,
+                            '503 for URL: ' + target_url],
                         'checksum': [target, 'ArtifactError$WrongChecksum'],
                         'truncated': [target, 'ArtifactError$WrongChecksum'],
                         'tls': [target, 'javax.net.ssl.SSLHandshakeException'],
