@@ -74,7 +74,11 @@ object IvyMirror {
     else {
       val slash = prefix.endsWith("/")
       val rel = CachePaths.relativePath(if (slash) prefix.stripSuffix("/") else prefix)
-      Some(base.stripSuffix("/") + "/" + rel + (if (slash) "/" else ""))
+      // Cache names contain literal percent escapes (including host ports).
+      // File URLs must preserve those percent signs through URI decoding;
+      // HTTP mirrors route the raw cache key. Keep Ivy pattern tokens intact.
+      val path = if (base.startsWith("file:")) rel.replace("%", "%25") else rel
+      Some(base.stripSuffix("/") + "/" + path + (if (slash) "/" else ""))
     }
 
   /** The URL a mirror URL below `base` mirrors; any other string as it is. */
@@ -82,7 +86,8 @@ object IvyMirror {
     val root = base.stripSuffix("/") + "/"
     if (!s.startsWith(root)) s
     else {
-      val rel = s.substring(root.length)
+      val raw = s.substring(root.length)
+      val rel = if (base.startsWith("file:")) raw.replace("%25", "%") else raw
       val slash = rel.endsWith("/")
       CachePaths.url(rel.stripSuffix("/")) + (if (slash) "/" else "")
     }
