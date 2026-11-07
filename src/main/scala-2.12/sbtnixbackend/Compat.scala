@@ -19,6 +19,12 @@ import sbt.librarymanagement.ivy.{
 /** The sbt 1 side of the sbt APIs that differ between sbt 1 and sbt 2; src/main/scala-3 holds the sbt 2 side.
   */
 object Compat {
+  def runEditorTask[A](extracted: Extracted, key: TaskKey[A], state: State): (State, A) =
+    ClassifierDownloads.run(
+      () => extracted.runTask(key, state),
+      (next, _) => state.log.warn(s"[sbt-nix-backend] transient classifier download failed; retry $next of 3 after ${if (next == 2) 1 else 2}s")
+    )
+
   def implicitRoot(project: ResolvedProject): Boolean = project.projectOrigin == ProjectOrigin.GenericRoot
 
   def moduleRevision(module: ModuleID, revision: String): ModuleID = module.withRevision(revision)
