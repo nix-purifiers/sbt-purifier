@@ -14,9 +14,14 @@ def sha256(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def terminal_text(output):
+    """Remove terminal CSI controls without changing version or origin text."""
+    return re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', output)
+
+
 def observed_origins(output, expected):
     """The JVM hashes CodeSource bytes before sbt removes shadow JARs."""
-    output = re.sub(r'\x1b\[[0-9;]*m', '', output)
+    output = terminal_text(output)
     observed = {}
     for line in output.splitlines():
         if line.startswith('[info] '):

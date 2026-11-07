@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -7,7 +8,7 @@ import time
 import unittest
 from unittest.mock import patch
 
-from composition_evidence import Evidence, sha256, observed_origins
+from composition_evidence import Evidence, sha256, observed_origins, terminal_text
 
 
 class EvidenceTests(unittest.TestCase):
@@ -64,6 +65,14 @@ class EvidenceTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'does not match actual derivation'):
                 self.evidence.selected('consumer', path)
         self.assertEqual(self.evidence.receipt['selectedOutputs'], [])
+
+    def test_sbt2_erase_line_controls_do_not_change_exact_version_or_origin(self):
+        output = '\x1b[0J\x1b[0m[\x1b[0minfo\x1b[0m] \x1b[0m2.0.12\x1b[0m\x1b[0J\n'
+        cleaned = terminal_text(output)
+        self.assertRegex(cleaned, r'(?m)^\[info\]\s*2\.0\.12\s*$')
+        self.assertNotRegex(cleaned, r'(?m)^\[info\]\s*2\.0\.13\s*$')
+        origin = '\x1b[0J[info] COMPOSITION_ORIGIN|proof.Marker|file:/deleted.jar|' + 'a'*64 + '\x1b[0J\n'
+        self.assertEqual(observed_origins(origin, {'proof.Marker'})['proof.Marker']['sha256'], 'a'*64)
 
     def test_runtime_hash_survives_sbt_shadow_jar_removal(self):
         jar = self.root / 'shadow.jar'
