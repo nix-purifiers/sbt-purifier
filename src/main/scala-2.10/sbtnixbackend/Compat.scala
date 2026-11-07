@@ -3,6 +3,9 @@ import java.io.File
 import sbt._
 import sbt.Keys._
 object Compat {
+  def runEditorTask[A](extracted: Extracted, key: TaskKey[A], state: State): (State, A) =
+    extracted.runTask(key, state)
+
   def implicitRoot(project: ResolvedProject): Boolean = true
 
   def moduleRevision(module: ModuleID, revision: String): ModuleID = module.copy(revision = revision)

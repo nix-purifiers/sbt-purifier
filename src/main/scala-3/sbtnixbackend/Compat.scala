@@ -8,6 +8,9 @@ import sbt.Keys.*
 /** The sbt 2 side of the sbt APIs that differ between sbt 1 and sbt 2; src/main/scala-2.12 holds the sbt 1 side.
   */
 object Compat {
+  def runEditorTask[A](extracted: Extracted, key: TaskKey[A], state: State): (State, A) =
+    extracted.runTask(key, state)
+
   def implicitRoot(project: ResolvedProject): Boolean = project.projectOrigin == ProjectOrigin.GenericRoot
 
   def moduleRevision(module: ModuleID, revision: String): ModuleID = module.withRevision(revision)

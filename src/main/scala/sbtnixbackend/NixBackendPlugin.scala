@@ -990,9 +990,9 @@ object NixBackendPlugin extends AutoPlugin {
       val extracted = Project.extract(state0)
       var state = state0
       extracted.structure.allProjectRefs.foreach { ref =>
-        state = extracted.runTask(ref / updateClassifiers, state)._1
+        state = Compat.runEditorTask(extracted, ref / updateClassifiers, state)._1
       }
-      extracted.runTask(updateSbtClassifiers, state)._1
+      Compat.runEditorTask(extracted, updateSbtClassifiers, state)._1
     }
 
   lazy val sandboxBuildCommand: Command =
