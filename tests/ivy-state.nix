@@ -1,15 +1,17 @@
 {
   source ? ../.,
   system ? builtins.currentSystem,
+  pkgs ?
+    let
+      f = builtins.getFlake (toString source);
+    in
+    import f.inputs.nixpkgs {
+      inherit system;
+      overlays = [ f.overlays.default ];
+    },
+  sdk ? pkgs.sbt-purifier.buildSbtProject { src = source + /tests/fixtures/multi; },
 }:
-let
-  f = builtins.getFlake (toString source);
-  pkgs = import f.inputs.nixpkgs {
-    inherit system;
-    overlays = [ f.overlays.default ];
-  };
-  sdk = pkgs.sbt-purifier.buildSbtProject { src = source + /tests/fixtures/multi; };
-in
+assert sdk.lock.sbtVersion == "1.13.1" && sdk.lock.javaVersion == "21";
 pkgs.runCommand "sbt-ivy-state"
   {
     nativeBuildInputs = [

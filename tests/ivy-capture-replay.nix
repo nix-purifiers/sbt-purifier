@@ -6,7 +6,7 @@
 let
   f = builtins.getFlake (toString producerSource);
   pkgs = import f.inputs.nixpkgs {
-    system = "x86_64-linux";
+    system = builtins.currentSystem;
     overlays = [ f.overlays.default ];
   };
   build = pkgs.sbt-purifier.buildSbtProject {

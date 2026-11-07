@@ -83,14 +83,16 @@ try:
     # Deliberately populate the ordinary evaluator URL cache with old bytes.
     first = json.loads(run(["nix-instantiate", "--eval", "--strict", "--json", "--read-write-mode", *common, "-A", "manifest"], "seed-old-manifest"))
     assert Path(json.loads(Path(first).read_text())[cache_path]).read_bytes() == payload
+    (state / "before-metadata.xml").write_bytes(Path(json.loads(Path(first).read_text())[cache_path]).read_bytes())
     payload = f"<metadata><version>after-{server.server_port}</version></metadata>".encode()
     replace_lock(payload)
     built = run(["nix-build", "--no-out-link", "--quiet", *common, "-A", "fetches"], "realize-new-fetches").splitlines()
-    outputs = [Path(line) for line in built if line.startswith("/nix/store/")]
+    outputs = [Path(line) for line in built if Path(line).is_absolute() and Path(line).is_file()]
     assert len(outputs) == 1 and outputs[0].read_bytes() == payload, "fetches must actually realize the new bytes before manifest evaluation"
     second = json.loads(run(["nix-instantiate", "--eval", "--strict", "--json", "--read-write-mode", *common, "-A", "manifest"], "new-manifest"))
     actual = Path(json.loads(Path(second).read_text())[cache_path])
     assert actual == outputs[0] and actual.read_bytes() == payload
+    (state / "after-metadata.xml").write_bytes(actual.read_bytes())
     (state / "receipt.json").write_text(json.dumps({"status": "PASS", "scope": "host Nix evaluator/FOD regression; not native Ivy capability", "librarySha256": hashlib.sha256(library.read_bytes()).hexdigest(), "newFod": str(actual), "newPayloadSha256": hashlib.sha256(payload).hexdigest(), "manifest": second}, indent=2) + "\n")
 finally:
     server.shutdown()

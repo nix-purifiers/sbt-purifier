@@ -10,6 +10,7 @@ import shutil
 import signal
 import subprocess
 import threading
+import time
 from urllib.parse import urlsplit
 
 
@@ -17,30 +18,47 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+deadline = float(os.environ.get("IVY_CAPTURE_DEADLINE_MONOTONIC", time.monotonic() + 90 * 60))
+
+
+def stop_owned_group(process):
+    for sig in (signal.SIGTERM, signal.SIGKILL):
+        try:
+            os.killpg(process.pid, sig)
+        except ProcessLookupError:
+            pass
+        try:
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            pass
+
+
 def command(args, *, cwd, env=None, log=None, timeout=600, success=True):
+    remaining = deadline - time.monotonic()
+    if remaining <= 0:
+        raise subprocess.TimeoutExpired(args, 0)
     print("RUN " + " ".join(map(str, args)), flush=True)
     stream = log.open("w") if log else subprocess.DEVNULL
+    errors = log.with_suffix(".stderr").open("w") if log and log.suffix == ".json" else subprocess.STDOUT
     process = subprocess.Popen(list(map(str, args)), cwd=cwd, env=env,
-                               stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
+                               stdout=stream, stderr=errors, start_new_session=True)
     try:
-        code = process.wait(timeout=timeout)
+        code = process.wait(timeout=min(timeout, remaining))
     except BaseException:
-        for sig in (signal.SIGTERM, signal.SIGKILL):
-            try:
-                os.killpg(process.pid, sig)
-            except ProcessLookupError:
-                pass
-            try:
-                process.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                pass
+        stop_owned_group(process)
         raise
     finally:
         if log:
             stream.close()
+        if errors != subprocess.STDOUT:
+            errors.close()
+    if code:
+        stop_owned_group(process)
     if (code == 0) != success:
         if log:
             print(log.read_text(), flush=True)
+            if log.suffix == ".json":
+                print(log.with_suffix(".stderr").read_text(), flush=True)
         raise AssertionError(f"Unexpected exit {code}: {args}")
     return code
 
@@ -63,16 +81,19 @@ env = dict(os.environ, HOME=str(state / "home"), TMPDIR=str(state / "tmp"),
 for key in ("HOME", "TMPDIR", "XDG_CACHE_HOME", "XDG_CONFIG_HOME", "XDG_STATE_HOME", "XDG_DATA_HOME"):
     Path(env[key]).mkdir(parents=True, exist_ok=True)
 expression = f'''let f = builtins.getFlake {json.dumps(str(source))};
- p = import f.inputs.nixpkgs {{ system = "x86_64-linux"; overlays = [ f.overlays.default ]; }};
+ system = builtins.currentSystem;
+ p = import f.inputs.nixpkgs {{ inherit system; overlays = [ f.overlays.default ]; }};
  sdk = p.sbt-purifier.buildSbtProject {{ src = {source}/tests/fixtures/multi; }};
- in {{ inject = toString f.packages.x86_64-linux.sbt.inject;
- repository = toString f.packages.x86_64-linux.sbt.pluginRepository;
- cli = toString f.packages.x86_64-linux.sbt-purifier;
+ in {{ inherit system; sbtVersion = sdk.lock.sbtVersion; javaMajor = sdk.lock.javaVersion;
+ inject = toString f.packages.${{system}}.sbt.inject;
+ repository = toString f.packages.${{system}}.sbt.pluginRepository;
+ cli = toString f.packages.${{system}}.sbt-purifier;
  jdk = sdk.jdk.home; nixpkgs = toString f.inputs.nixpkgs;
  cache = toString sdk.dependencies; launcher = sdk.lock.launcher; }}'''
 tool_json = state / "tools.json"
 command(["nix", "eval", "--impure", "--json", "--expr", expression], cwd=state, env=env, log=tool_json)
 tools = json.loads(tool_json.read_text())
+assert tools["sbtVersion"] == "1.13.1" and tools["javaMajor"] == "21", "The native fixture must retain the explicit sbt1.13.1/Java21 test point"
 command(["nix", "build", f"path:{source}#sbt-purifier", "--out-link", state / "cli"],
         cwd=state, env=env, log=logs / "tools-build.log")
 repo = state / "origin"
@@ -205,7 +226,7 @@ def native(project, commands, label, injected=True, expected_revision=None):
     saved.parent.mkdir(exist_ok=True)
     if lock.exists():
         saved.write_bytes(lock.read_bytes())
-    value = {"phase": label, "scope": "host native purifier task" if injected else "host plugin-free native fresh oracle", "commands": commands,
+    value = {"phase": label, "cachedResolution": cached, "scope": "host native purifier task" if injected else "host plugin-free native fresh oracle", "commands": commands,
              "exitCode": code, "candidate": before, "logSha256": sha(log), "lockSha256": sha(lock) if lock.exists() else None}
     phases.append(value)
     (state / "partial-phases.json").write_text(json.dumps(phases, indent=2) + "\n")
@@ -253,8 +274,8 @@ def replay(project, lock_bytes, label, revision, missing=False):
         assert f"IVY_CAPTURE_LOADED leaf-{revision} {expected['leaf:' + revision]}" in text
     info = state / (label + "-path-info.json")
     if not missing:
-        command(["nix", "path-info", "--json", "--json-format", "2", bound["app"]["out"], str(state / (label + "-result"))], cwd=state, env=env, log=info)
-    phases.append({"phase": label, "scope": "actual sandboxed compile/test/runtime replay", "exitCode": code, "expectedRevision": revision, "negativeMissingRecord": missing, "bindings": bound, "lockSha256": sha(lock), "nativeLogSha256": sha(native_log)})
+        command(["nix", "path-info", "--json", bound["app"]["out"], str(state / (label + "-result"))], cwd=state, env=env, log=info)
+    phases.append({"phase": label, "cachedResolution": cached, "scope": "actual sandboxed compile/test/runtime replay", "exitCode": code, "expectedRevision": revision, "negativeMissingRecord": missing, "bindings": bound, "lockSha256": sha(lock), "nativeLogSha256": sha(native_log)})
     assert (project / "sbt-purifier.lock.json").read_bytes() == lock_bytes
 
 
