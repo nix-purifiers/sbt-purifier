@@ -109,7 +109,17 @@ jobs:
           fetch-depth: 0
       - uses: cachix/install-nix-action@v31
       - name: Native Nix project inputs and publication
-        run: python3 tests/composition-native.py --sbt-version '${{ matrix.sbt }}'
+        timeout-minutes: 53
+        run: >-
+          python3 tests/composition-native.py --sbt-version '${{ matrix.sbt }}'
+          --results "$RUNNER_TEMP/sbt-composition-evidence"
+      - name: Retain composition receipts and raw logs, including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: sbt-composition-${{ matrix.runner }}-${{ matrix.sbt }}
+          path: ${{ runner.temp }}/sbt-composition-evidence
+          if-no-files-found: error
 
   # Exact SDK points, with a real upstream sample on sbt 1 and the existing
   # sbt 2 fixture. Native controls, locking, prefetch, empty-cache offline
