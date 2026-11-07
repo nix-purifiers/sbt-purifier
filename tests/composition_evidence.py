@@ -7,10 +7,33 @@ import re
 import signal
 import subprocess
 import time
+from urllib.parse import urlparse
 
 
 def sha256(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def observed_origins(output, expected):
+    """The JVM hashes CodeSource bytes before sbt removes shadow JARs."""
+    output = re.sub(r'\x1b\[[0-9;]*m', '', output)
+    observed = {}
+    for line in output.splitlines():
+        if line.startswith('[info] '):
+            line = line[len('[info] '):]
+        if not line.startswith('COMPOSITION_ORIGIN|'):
+            continue
+        _, name, uri, checksum = line.split('|')
+        if name not in expected:
+            continue
+        parsed = urlparse(uri)
+        if (name in observed or parsed.scheme != 'file' or parsed.netloc
+                or re.fullmatch(r'[0-9a-f]{64}', checksum) is None):
+            raise ValueError('invalid runtime origin observation')
+        observed[name] = {'origin': uri, 'sha256': checksum}
+    if set(observed) != set(expected):
+        raise ValueError('missing runtime origin observation')
+    return observed
 
 
 class Evidence:
