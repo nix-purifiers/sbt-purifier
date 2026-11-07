@@ -4,7 +4,7 @@
 from pathlib import Path
 import argparse, json, os, re, shutil, tempfile
 from urllib.parse import unquote, urlparse
-from composition_evidence import Evidence, sha256
+from composition_evidence import Evidence, sha256, observed_origins
 import xml.etree.ElementTree as ET
 
 def compose(args, evidence):
@@ -75,14 +75,24 @@ def compose(args, evidence):
         source.parent.mkdir(parents=True)
         source.write_text('''package example;
     public class NativeMain {
-      public static void main(String[] args) {
+      public static void main(String[] args) throws Exception {
         String result = org.apache.commons.text.WordUtils.capitalizeFully("hello nix");
         if (!result.equals("Hello Nix")) throw new AssertionError(result);
         System.out.println(result);
         System.out.println("COMPOSITION_JAVA_HOME|" + System.getProperty("java.home"));
         System.out.println("COMPOSITION_JAVA_VERSION|" + System.getProperty("java.runtime.version"));
         for (Class<?> cls : new Class<?>[] {NativeMain.class, org.apache.commons.text.WordUtils.class, org.apache.commons.lang3.StringUtils.class}) {
-          System.out.println("COMPOSITION_ORIGIN|" + cls.getName() + "|" + cls.getProtectionDomain().getCodeSource().getLocation());
+          java.net.URL origin = cls.getProtectionDomain().getCodeSource().getLocation();
+          java.nio.file.Path payload = java.nio.file.Paths.get(origin.toURI());
+          String checksum = "directory";
+          if (java.nio.file.Files.isRegularFile(payload)) {
+            StringBuilder hash = new StringBuilder();
+            for (byte value : java.security.MessageDigest.getInstance("SHA-256").digest(java.nio.file.Files.readAllBytes(payload))) {
+              hash.append(String.format("%02x", value & 255));
+            }
+            checksum = hash.toString();
+          }
+          System.out.println("COMPOSITION_ORIGIN|" + cls.getName() + "|" + origin + "|" + checksum);
         }
       }
     }
@@ -128,18 +138,8 @@ def compose(args, evidence):
         assert java_home.startswith('/nix/store/'), 'native JVM must have an immutable SDK identity'
         evidence.receipt['nativeJvm'] = {'home': java_home, 'version': java_version, 'role': 'native-project-runtime'}
         evidence.selected('native-project-jdk', '/'.join(java_home.split('/')[:4]))
-        native_dependencies = {}
-        for match in re.finditer(r'COMPOSITION_ORIGIN\|([^|\r\n]+)\|([^\r\n]+)', plain_native):
-            cls, uri = match.groups()
-            if cls not in ('org.apache.commons.text.WordUtils', 'org.apache.commons.lang3.StringUtils'):
-                continue
-            assert cls not in native_dependencies, 'duplicate native loaded origin'
-            parsed = urlparse(uri.strip())
-            assert parsed.scheme == 'file' and not parsed.netloc
-            jar = Path(unquote(parsed.path))
-            assert jar.is_file(), 'native dependency must load a concrete JAR'
-            native_dependencies[cls] = {'origin': uri.strip(), 'sha256': sha256(jar)}
-        assert set(native_dependencies) == {'org.apache.commons.text.WordUtils', 'org.apache.commons.lang3.StringUtils'}
+        native_dependencies = observed_origins(plain_native,
+            {'org.apache.commons.text.WordUtils', 'org.apache.commons.lang3.StringUtils'})
         provider_jar = Path(provider) / 'org/apache/commons/commons-lang3/0.0.1/commons-lang3-0.0.1.jar'
         assert native_dependencies['org.apache.commons.lang3.StringUtils']['sha256'] == sha256(provider_jar), 'native consumer did not load selected Nix provider bytes'
         evidence.receipt['nativeLoadedDependencies'] = native_dependencies
@@ -225,16 +225,11 @@ def compose(args, evidence):
             (downstream / 'classpath').read_text().strip(), 'example.NativeMain'],
             cwd=downstream, env=plain, text=True)
         assert 'Hello Nix' in output, output
-        observations = {}
-        for line in output.splitlines():
-            if line.startswith('COMPOSITION_ORIGIN|'):
-                _, cls, uri = line.split('|', 2)
-                parsed = urlparse(uri)
-                assert parsed.scheme == 'file' and not parsed.netloc
-                jar = Path(unquote(parsed.path))
-                assert sha256(jar) == sha256(expected_origins[cls]), 'ordinary consumer loaded different publication bytes'
-                observations[cls] = {'origin': uri, 'sha256': sha256(jar), 'publishedSha256': sha256(expected_origins[cls])}
-        assert set(observations) == set(expected_origins)
+        observations = observed_origins(output, set(expected_origins))
+        for cls, observation in observations.items():
+            jar = Path(unquote(urlparse(observation['origin']).path))
+            assert sha256(jar) == observation['sha256'] == sha256(expected_origins[cls]), 'ordinary consumer loaded different publication bytes'
+            observation['publishedSha256'] = sha256(expected_origins[cls])
         evidence.receipt['ordinaryConsumer'] = {'stdout': output, 'loadedOrigins': observations}
         evidence.receipt['operationResults'] = {name: 'passed' for name in [
             'native-lock', 'project-build-scripts', 'native-input-composition',

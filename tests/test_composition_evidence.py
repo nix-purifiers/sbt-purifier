@@ -7,7 +7,7 @@ import time
 import unittest
 from unittest.mock import patch
 
-from composition_evidence import Evidence, sha256
+from composition_evidence import Evidence, sha256, observed_origins
 
 
 class EvidenceTests(unittest.TestCase):
@@ -64,6 +64,18 @@ class EvidenceTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'does not match actual derivation'):
                 self.evidence.selected('consumer', path)
         self.assertEqual(self.evidence.receipt['selectedOutputs'], [])
+
+    def test_runtime_hash_survives_sbt_shadow_jar_removal(self):
+        jar = self.root / 'shadow.jar'
+        jar.write_bytes(b'actual runtime payload')
+        checksum = sha256(jar)
+        output = f'COMPOSITION_ORIGIN|proof.Marker|{jar.as_uri()}|{checksum}\n'
+        jar.unlink()
+        self.assertEqual(observed_origins(output, {'proof.Marker'})['proof.Marker']['sha256'], checksum)
+        with self.assertRaisesRegex(ValueError, 'invalid runtime origin'):
+            observed_origins(output.replace(checksum, 'directory'), {'proof.Marker'})
+        with self.assertRaisesRegex(ValueError, 'missing runtime origin'):
+            observed_origins('[info] [nix] warning: ' + output, {'proof.Marker'})
 
 
 if __name__ == '__main__':
