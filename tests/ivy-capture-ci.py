@@ -33,6 +33,11 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def java_properties(text):
+    return dict((key.strip(), value.strip()) for key, value in
+                (line.split(" = ", 1) for line in text.splitlines() if " = " in line))
+
+
 def stop_owned_group(process):
     for sig in (signal.SIGTERM, signal.SIGKILL):
         try:
@@ -202,12 +207,12 @@ try:
     run(["nix", "--version"], "nix-version", 30)
     tools = json.loads((results / "capture/tools.json").read_text())
     run([Path(tools["jdk"]) / "bin/java", "-Duser.home=" + env["HOME"], "-Djava.io.tmpdir=" + env["TMPDIR"], "-XshowSettings:properties", "-version"], "java-runtime", 30)
-    java_properties = dict(line.strip().split(" = ", 1) for line in (results / "java-runtime.stderr").read_text().splitlines() if " = " in line)
-    assert java_properties["os.arch"].lower() in machines[system]
-    assert java_properties["java.version"].split(".", 1)[0] == "21"
+    properties = java_properties((results / "java-runtime.stderr").read_text())
+    assert properties["os.arch"].lower() in machines[system]
+    assert properties["java.version"].split(".", 1)[0] == "21"
     receipt.update(status="passed", phaseCount=24, distinctFixedOutputFilesHashed=len(fixed_files),
                    selectedOutputCount=len(selected), selectedOutputArchives=archives, tools=tools,
-                   observedJava={key: java_properties[key] for key in ("java.version", "java.runtime.version", "java.vendor", "os.arch")})
+                   observedJava={key: properties[key] for key in ("java.version", "java.runtime.version", "java.vendor", "os.arch")})
 except BaseException as error:
     receipt.update(status="failed", error=type(error).__name__ + ": " + str(error))
     raise
