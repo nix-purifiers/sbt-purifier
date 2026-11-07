@@ -10,6 +10,7 @@ import shutil
 import signal
 import subprocess
 import threading
+from urllib.parse import urlsplit
 
 
 def sha(path):
@@ -48,13 +49,14 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--state", required=True, type=Path)
 parser.add_argument("--producer-source", required=True, type=Path)
 parser.add_argument("--native-fixture", required=True, type=Path)
+parser.add_argument("--resume-after-relock", action="store_true", help="Continue a retained cachedResolution=false run after its successful relocked replay")
 args = parser.parse_args()
 state = args.state.resolve()
-state.mkdir(parents=True, exist_ok=False)
+state.mkdir(parents=True, exist_ok=args.resume_after_relock)
 source = args.producer_source.resolve()
 fixture = args.native_fixture.resolve()
 logs = state / "logs"
-logs.mkdir()
+logs.mkdir(exist_ok=args.resume_after_relock)
 env = dict(os.environ, HOME=str(state / "home"), TMPDIR=str(state / "tmp"),
            XDG_CACHE_HOME=str(state / "xdg/cache"), XDG_CONFIG_HOME=str(state / "xdg/config"),
            XDG_STATE_HOME=str(state / "xdg/state"), XDG_DATA_HOME=str(state / "xdg/data"))
@@ -74,14 +76,26 @@ tools = json.loads(tool_json.read_text())
 command(["nix", "build", f"path:{source}#sbt-purifier", "--out-link", state / "cli"],
         cwd=state, env=env, log=logs / "tools-build.log")
 repo = state / "origin"
-shutil.copytree(fixture / "fixture-repository", repo)
+if not args.resume_after_relock:
+    shutil.copytree(fixture / "fixture-repository", repo)
 for path in [repo, *repo.rglob("*")]:
     path.chmod(path.stat().st_mode | (0o700 if path.is_dir() else 0o200))
 sdk_root = Path(tools["cache"]) / "https/repo1.maven.org/maven2"
 published = {"1", "2"}
-requests = []
-manifests = []
-phases = []
+requests = json.loads((state / "requests.json").read_text()) if args.resume_after_relock else []
+manifests = json.loads((state / "candidate-manifests.json").read_text()) if args.resume_after_relock else []
+phases = json.loads((state / "phases.json").read_text()) if args.resume_after_relock else []
+if args.resume_after_relock:
+    assert any(p["phase"] == "False-relocked-replay" and p["exitCode"] == 0 for p in phases)
+    for phase in phases:
+        if "logSha256" in phase:
+            assert sha(logs / (phase["phase"] + ".log")) == phase["logSha256"]
+        if "nativeLogSha256" in phase:
+            assert sha(logs / (phase["phase"] + "-native-replay.log")) == phase["nativeLogSha256"]
+    old_lock = json.loads((state / "consumer-False/sbt-purifier.lock.json").read_text())
+    port = urlsplit(next(a["url"] for a in old_lock["artifacts"] if "/proof/leaf/" in a["url"])).port
+else:
+    port = 0
 
 
 def manifest(label):
@@ -119,7 +133,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return super().send_head()
 
 
-server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(Handler, directory=str(repo)))
+server = http.server.ThreadingHTTPServer(("127.0.0.1", port), functools.partial(Handler, directory=str(repo)))
 threading.Thread(target=server.serve_forever, daemon=True).start()
 origin = f"http://127.0.0.1:{server.server_port}"
 env["SBT_NIX_BACKEND_MAVEN_CENTRAL_MIRROR"] = origin + "/maven2/"
@@ -234,7 +248,7 @@ def replay(project, lock_bytes, label, revision, missing=False):
     command(["nix", "log", bound["app"]["drv"]], cwd=state, env=env, log=native_log)
     text = native_log.read_text()
     if missing:
-        assert "IVY_CAPTURE_LOADED" not in text and ("leaf" in text and ("not found" in text.lower() or "unresolved" in text.lower()))
+        assert "IVY_CAPTURE_LOADED" not in text and f"download failed: proof#leaf;{revision}!leaf.jar" in text
     else:
         assert f"IVY_CAPTURE_LOADED leaf-{revision} {expected['leaf:' + revision]}" in text
     info = state / (label + "-path-info.json")
@@ -246,26 +260,32 @@ def replay(project, lock_bytes, label, revision, missing=False):
 
 try:
     for cached in (False, True):
-        publish(["1", "2"])
-        oracle = state / f"oracle-before-{cached}"
-        write_project(oracle, cached)
-        native(oracle, ["compile", "runMain proof.Consumer"], f"{cached}-fresh-before-oracle", injected=False, expected_revision="2")
-        project = state / f"consumer-{cached}"
-        write_project(project, cached)
-        first = native(project, ["nixLock"], f"{cached}-initial-lock")
-        replay(project, first, f"{cached}-initial-replay", "2")
-        repeat = native(project, ["nixLock"], f"{cached}-repeat-lock")
-        assert first == repeat
-        publish(["1", "2", "3"])
-        oracle = state / f"oracle-after-{cached}"
-        write_project(oracle, cached)
-        native(oracle, ["compile", "runMain proof.Consumer"], f"{cached}-fresh-after-oracle", injected=False, expected_revision="3")
-        noop = native(project, ["nixLock"], f"{cached}-after-publication-noop")
-        assert first == noop
-        relocked = native(project, ["nixRelock"], f"{cached}-forced-relock")
-        assert relocked != first
-        replay(project, relocked, f"{cached}-relocked-replay", "3")
-        replay(project, relocked, f"{cached}-missing-selected", "3", missing=True)
+        if args.resume_after_relock and not cached:
+            publish(["1", "2", "3"])
+            project = state / "consumer-False"
+            relocked = (project / "sbt-purifier.lock.json").read_bytes()
+        else:
+            publish(["1", "2"])
+            oracle = state / f"oracle-before-{cached}"
+            write_project(oracle, cached)
+            native(oracle, ["compile", "runMain proof.Consumer"], f"{cached}-fresh-before-oracle", injected=False, expected_revision="2")
+            project = state / f"consumer-{cached}"
+            write_project(project, cached)
+            first = native(project, ["nixLock"], f"{cached}-initial-lock")
+            replay(project, first, f"{cached}-initial-replay", "2")
+            repeat = native(project, ["nixLock"], f"{cached}-repeat-lock")
+            assert first == repeat
+            publish(["1", "2", "3"])
+            oracle = state / f"oracle-after-{cached}"
+            write_project(oracle, cached)
+            native(oracle, ["compile", "runMain proof.Consumer"], f"{cached}-fresh-after-oracle", injected=False, expected_revision="3")
+            noop = native(project, ["nixLock"], f"{cached}-after-publication-noop")
+            assert first == noop
+            relocked = native(project, ["nixRelock"], f"{cached}-forced-relock")
+            assert relocked != first
+            replay(project, relocked, f"{cached}-relocked-replay", "3")
+        negative_label = f"{cached}-missing-selected" + ("-retry" if args.resume_after_relock and not cached else "")
+        replay(project, relocked, negative_label, "3", missing=True)
         replay(project, relocked, f"{cached}-restored-selected", "3")
         repeated = native(project, ["nixLock"], f"{cached}-after-relock-noop")
         assert repeated == relocked
