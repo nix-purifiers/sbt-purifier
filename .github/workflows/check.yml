@@ -121,6 +121,53 @@ jobs:
           path: ${{ runner.temp }}/sbt-composition-evidence
           if-no-files-found: error
 
+  # Original Ivy cache state, lock policy and offline runtime at one SDK point.
+  ivy-capture:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31
+        with:
+          extra_nix_config: |
+            sandbox = true
+            max-jobs = 2
+            cores = 2
+      - uses: cachix/cachix-action@38b082610b782e7e93e209c35fd730d399dee866 # v17
+        with:
+          name: clhodapp
+          skipPush: true
+      - name: Native Ivy capture policy and sandboxed replay on sbt 1.13.1
+        timeout-minutes: 100
+        run: python3 -B tests/ivy-capture-ci.py --results "$RUNNER_TEMP/sbt-ivy-evidence"
+      - name: Retain Ivy source, locks, derivations and native failure evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: sbt-ivy-${{ matrix.runner }}-1.13.1
+          path: |
+            ${{ runner.temp }}/sbt-ivy-evidence/*.json
+            ${{ runner.temp }}/sbt-ivy-evidence/*.stdout
+            ${{ runner.temp }}/sbt-ivy-evidence/*.stderr
+            ${{ runner.temp }}/sbt-ivy-evidence/*.nar
+            ${{ runner.temp }}/sbt-ivy-evidence/check-native/**
+            ${{ runner.temp }}/sbt-ivy-evidence/check-mutable/**
+            ${{ runner.temp }}/sbt-ivy-evidence/capture/*.json
+            ${{ runner.temp }}/sbt-ivy-evidence/capture/*.stderr
+            ${{ runner.temp }}/sbt-ivy-evidence/capture/logs/**
+            ${{ runner.temp }}/sbt-ivy-evidence/capture/locks/*.json
+            ${{ runner.temp }}/sbt-ivy-evidence/capture/snapshots/**/build.sbt
+            ${{ runner.temp }}/sbt-ivy-evidence/capture/snapshots/**/build.properties
+            ${{ runner.temp }}/sbt-ivy-evidence/capture/snapshots/**/*.java
+          if-no-files-found: error
+          retention-days: 14
+
   # Exact SDK points, with a real upstream sample on sbt 1 and the existing
   # sbt 2 fixture. Native controls, locking, prefetch, empty-cache offline
   # tests and sandboxed builds all execute on each runner.

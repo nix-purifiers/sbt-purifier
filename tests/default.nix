@@ -683,3 +683,10 @@ in
   };
 
 }
+// lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+  ivy-native-state = import ./ivy-state.nix {
+    inherit pkgs;
+    sdk = multi;
+  };
+  realize-mutable-metadata = import ./realize-mutable-metadata.nix { inherit pkgs; };
+}
