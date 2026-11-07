@@ -32,7 +32,7 @@ let
     );
 in
 {
-  fetches = byPath fetcher.fetch;
+  fetches = builtins.attrValues (byPath fetcher.fetch);
   manifest = builtins.toFile "sbt-purifier-coursier-cache.json" (
     builtins.toJSON (
       byPath (
