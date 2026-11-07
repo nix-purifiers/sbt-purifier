@@ -16,17 +16,28 @@ import xml.etree.ElementTree as ET
 
 
 def run(args, timeout=60, check=True, **kw):
-    with subprocess.Popen(args, start_new_session=True, **kw) as process:
+    process = subprocess.Popen(args, start_new_session=True, **kw)
+    try:
+        code = process.wait(timeout=timeout)
+    except BaseException:
         try:
-            code = process.wait(timeout=timeout)
-        except BaseException:
             os.killpg(process.pid, signal.SIGTERM)
-            try:
-                process.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                os.killpg(process.pid, signal.SIGKILL)
-                process.wait(timeout=5)
-            raise
+        except ProcessLookupError:
+            pass
+        try:
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            pass
+        # Escalate for descendants even if the direct child already exited.
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        try:
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            pass
+        raise
     if check and code:
         raise subprocess.CalledProcessError(code, args)
     return subprocess.CompletedProcess(args, code)
