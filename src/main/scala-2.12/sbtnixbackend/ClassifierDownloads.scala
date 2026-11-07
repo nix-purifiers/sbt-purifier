@@ -25,7 +25,8 @@ private[sbtnixbackend] object ClassifierDownloads {
 
   private def artifactFailure(error: Throwable): Boolean = error match {
     case downloading: FetchError.DownloadingArtifacts =>
-      downloading.getSuppressed.isEmpty && downloading.errors.nonEmpty && downloading.errors.forall {
+      downloading.getSuppressed.isEmpty && downloading.errors.nonEmpty &&
+        (downloading.getCause eq downloading.errors.head._2) && downloading.errors.forall {
         case (artifact, failure: ArtifactError.DownloadError) =>
           failure.getSuppressed.isEmpty && httpFailure(failure.getCause, artifact.url, Vector.empty)
         case _ => false

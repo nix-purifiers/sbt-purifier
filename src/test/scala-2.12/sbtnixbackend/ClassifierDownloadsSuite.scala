@@ -195,6 +195,12 @@ class ClassifierDownloadsSuite extends munit.FunSuite {
     val io = new IOException(message(503))
     io.addSuppressed(new IOException("other transport error"))
     assert(!ClassifierDownloads.retryable(failure(Artifact(url) -> download(io))))
+    val mutableErrors = scala.collection.mutable.ArrayBuffer[(Artifact, ArtifactError)](
+      Artifact(url) -> download(new IOException("unrecognized original cause")))
+    val changed = new FetchError.DownloadingArtifacts(mutableErrors)
+    mutableErrors.update(0, Artifact(url) -> download(new IOException(message(503))))
+    assert(!ClassifierDownloads.retryable(Incomplete(None, directCause = Some(changed))),
+      "the native exception cause must still be the enumerated first artifact failure")
     val cyclic = new IOException(message(503))
     val next = new IOException(message(503), cyclic)
     cyclic.initCause(next)
