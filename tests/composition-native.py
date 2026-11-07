@@ -46,7 +46,7 @@ def compose(args, evidence):
     evidence.save()
     print(json.dumps({'producerSource': {'revision': revision, 'reference': reference,
         'path': snapshot, 'narHash': source_nar_hash}, 'system': system, 'sbtVersion': args.sbt_version}), flush=True)
-    with tempfile.TemporaryDirectory(prefix='sbt-native-composition-') as temporary:
+    with tempfile.TemporaryDirectory(prefix='sbt-native-composition-') as temporary, evidence.case():
         temporary = Path(temporary)
         package = evidence.output(['nix', 'build', 'path:' + snapshot + '#sbt',
             '--print-out-paths', '--out-link', str(temporary / 'wrapper')], text=True).strip().splitlines()[-1]
@@ -237,7 +237,7 @@ def compose(args, evidence):
             'ordinary-consumer-loaded-origin-equality']}
         evidence.receipt['complete'] = True
         evidence.save()
-        print('SBT NATIVE COMPOSITION PASSED: ' + args.sbt_version)
+    print('SBT NATIVE COMPOSITION PASSED: ' + args.sbt_version)
 
 
 def main():
@@ -249,9 +249,11 @@ def main():
     try:
         compose(args, evidence)
     except BaseException as error:
+        evidence.receipt['complete'] = False
         evidence.receipt['failure'] = type(error).__name__ + ': ' + str(error)
         raise
     finally:
+        evidence.close()
         evidence.save()
 
 
