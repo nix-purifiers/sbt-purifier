@@ -4,7 +4,7 @@
 from pathlib import Path
 import argparse, json, os, re, shutil, tempfile
 from urllib.parse import unquote, urlparse
-from composition_evidence import Evidence, sha256, observed_origins
+from composition_evidence import Evidence, sha256, observed_origins, terminal_text
 import xml.etree.ElementTree as ET
 
 def compose(args, evidence):
@@ -113,7 +113,7 @@ def compose(args, evidence):
             evidence.save()
             return output
         settings = run('show sbtVersion', 'show scalaVersion', 'show javaHome')
-        plain_settings = re.sub(r'\x1b\[[0-9;]*m', '', settings)
+        plain_settings = terminal_text(settings)
         assert re.search(r'(?m)^\[info\]\s*' + re.escape(args.sbt_version) + r'\s*$', plain_settings), 'actual sbt version differs'
         evidence.receipt['nativeSettings'] = settings
         run('nixLock')
@@ -130,7 +130,7 @@ def compose(args, evidence):
         assert not any('/commons-lang3/0.0.1-nix-' in entry['path'] for entry in locked['artifacts'])
         native_output = run('run', 'makePom', 'nixRuntimeRepository')
         evidence.receipt['nativeRunOutput'] = native_output
-        plain_native = re.sub(r'\x1b\[[0-9;]*m', '', native_output)
+        plain_native = terminal_text(native_output)
         java_home = re.search(r'COMPOSITION_JAVA_HOME\|([^\r\n]+)', plain_native).group(1).strip()
         java_version = re.search(r'COMPOSITION_JAVA_VERSION\|([^\r\n]+)', plain_native).group(1).strip()
         java_major = java_version.split('.')[1] if java_version.startswith('1.') else java_version.split('.')[0]
