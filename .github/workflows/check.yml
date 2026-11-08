@@ -168,6 +168,49 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  # The pin lifecycle follows the native x86 Linux tuple exercised locally.
+  ivy-pin-return:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31
+        with:
+          extra_nix_config: |
+            sandbox = true
+            max-jobs = 2
+            cores = 2
+      - uses: cachix/cachix-action@38b082610b782e7e93e209c35fd730d399dee866 # v17
+        with:
+          name: clhodapp
+          skipPush: true
+      - name: Native Ivy pin to Nix provider and back on sbt 1.13.1
+        timeout-minutes: 80
+        run: >-
+          python3 -B tests/ivy-pin-ci.py
+          --results "$RUNNER_TEMP/sbt-ivy-pin-evidence"
+          --runtime-directory "$RUNNER_TEMP/sbt-pin"
+      - name: Retain pin lifecycle source, origins and partial failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: sbt-ivy-pin-ubuntu-24.04-1.13.1
+          path: |
+            ${{ runner.temp }}/sbt-ivy-pin-evidence/*.json
+            ${{ runner.temp }}/sbt-ivy-pin-evidence/*.log
+            ${{ runner.temp }}/sbt-ivy-pin-evidence/*.nar
+            ${{ runner.temp }}/sbt-ivy-pin-evidence/experiment/*.json
+            ${{ runner.temp }}/sbt-ivy-pin-evidence/experiment/logs/**
+            ${{ runner.temp }}/sbt-ivy-pin-evidence/experiment/provider/*.nix
+            ${{ runner.temp }}/sbt-ivy-pin-evidence/experiment/provider/flake.lock
+            ${{ runner.temp }}/sbt-ivy-pin-evidence/experiment/snapshots/**/build.sbt
+            ${{ runner.temp }}/sbt-ivy-pin-evidence/experiment/snapshots/**/build.properties
+            ${{ runner.temp }}/sbt-ivy-pin-evidence/experiment/snapshots/**/*.java
+          if-no-files-found: error
+          retention-days: 14
+
   # Exact SDK points, with a real upstream sample on sbt 1 and the existing
   # sbt 2 fixture. Native controls, locking, prefetch, empty-cache offline
   # tests and sandboxed builds all execute on each runner.
