@@ -57,6 +57,8 @@ def retain_roles():
         else:
             details = info[selected]
         drv = details.get("deriver")
+        if drv and not drv.startswith("/"):
+            drv = str(Path(selected).parent / drv)
         if drv and drv.endswith(".drv"):
             if drv not in record["drvPaths"]:
                 record["drvPaths"].append(drv)
