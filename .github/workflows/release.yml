@@ -21,7 +21,7 @@
 #  - into the Maven repository that GitHub Pages serves at
 #    https://nix-purifiers.github.io/sbt-purifier/maven. The site is built
 #    from the zips of every release (.github/release/pages.sh) and
-#    merged with the README documentation and deployed as one Pages artifact.
+#    given central documentation redirects and deployed as one Pages artifact.
 #    The combined site is refreshed after every successful main check, even
 #    when the plugin artifacts are unchanged.
 #
@@ -157,23 +157,13 @@ jobs:
           gh release create "v$VERSION" --target "$SHA" --title "v$VERSION" --notes-file "$RUNNER_TEMP/notes.md" \
             "$zip" "$RUNNER_TEMP/release/SHA256SUMS"
 
-      - name: Check out the shared documentation theme
+      - name: Check out shared native publication infrastructure
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: nix-purifiers/nix-purifiers.github.io
-          ref: 4062bb93a31bc56e5b5a86a1bb1d40656719f987
+          ref: 90b2d04ee9560ef75af80bd0a48d7d976c7b8824
           path: .pages-theme
           persist-credentials: false
-      - name: Prepare the project documentation
-        run: python3 .pages-theme/docs-site/prepare.py --repository "$GITHUB_REPOSITORY" --model --source-status .
-      - name: Build the project documentation
-        uses: actions/jekyll-build-pages@44a6e6beabd48582f863aeeb6cb2151cc1716697 # v1
-        with:
-          source: .pages-source
-          destination: .pages-site
-          future: true
-          build_revision: ${{ env.SHA }}
-
       - name: Build the Maven repository from every release
         run: |
           set -euo pipefail
@@ -183,7 +173,8 @@ jobs:
             gh release download "$tag" --pattern '*-maven.zip' --dir "$zips"
           done
           .github/release/pages.sh "$RUNNER_TEMP/site" "$zips"
-          cp -R .pages-site/. "$RUNNER_TEMP/site/"
+          python3 .pages-theme/release/documentation_entry.py \
+            --repository "$GITHUB_REPOSITORY" --site "$RUNNER_TEMP/site"
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
