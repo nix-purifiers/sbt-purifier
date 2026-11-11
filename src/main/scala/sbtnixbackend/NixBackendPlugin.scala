@@ -858,7 +858,8 @@ object NixBackendPlugin extends AutoPlugin {
     if (previous.definitionHash != Lock.buildDefinitionHash(in.buildRoot, Nil) || previous.sbtVersion != in.sbtVersion ||
         previous.javaVersion != Lock.javaMajor(System.getProperty("java.version")))
       sys.error("sbt-purifier: the project or toolchain changed; lock its dependencies before updating the purifier")
-    val pin = ImplementationPin.installed.getOrElse(sys.error("sbt-purifier: the selected implementation has no portable identity"))
+    val pin = previous.implementation.getOrElse(sys.error("sbt-purifier: implementation migration requires a staged pin"))
+    requirePinnedPlugin(pin)
     // Do not run a fresh dependency resolver: dynamic versions and snapshots
     // must retain their existing captured bytes during an implementation update.
     previous.copy(plugin = in.plugin, inputsHash = in.inputsHash, implementation = Some(pin)).write(file)
