@@ -318,6 +318,20 @@ in
           --bootstrap ${bootstrap.tool} --source-model ${bootstrap.sourceModel} "$@"
       '';
     };
+  implementation-lock-path = pkgs.runCommand "sbt-purifier-implementation-lock-path" { } ''
+    mkdir -p stub
+    cat > stub/realpath <<'SH'
+    #!${pkgs.runtimeShell}
+    exit 77
+    SH
+    chmod +x stub/realpath
+    status=0
+    PATH="$PWD/stub:$PATH" ${withOverlay.sbt-purifier.sbt-purifier}/bin/sbt-purifier \
+      invalid-action --lockfile missing/../external/lock.json >stdout 2>stderr || status=$?
+    test "$status" = 2
+    grep -F 'usage: sbt-purifier' stderr
+    touch "$out"
+  '';
   implementation-mode =
     pkgs.runCommand "sbt-purifier-implementation-mode" { nativeBuildInputs = [ pkgs.python3 ]; }
       ''

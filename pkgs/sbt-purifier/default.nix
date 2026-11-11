@@ -46,7 +46,7 @@ writeShellScriptBin "sbt-purifier" ''
     case $1 in
       --lockfile)
         [ $# -ge 2 ] || usage
-        SBT_PURIFIER_LOCKFILE=$(realpath -m "$2")
+        SBT_PURIFIER_LOCKFILE=$(${pkgs.coreutils}/bin/realpath -m "$2")
         export SBT_PURIFIER_LOCKFILE
         shift 2
         ;;
