@@ -294,6 +294,30 @@ let
 
 in
 {
+  implementation-lifecycle-driver =
+    let
+      bootstrap = pkgs.callPackage flakeLib.purifier.implementation {
+        source = { };
+        repository = "nix-purifiers/sbt-purifier";
+        tool = "sbt-purifier";
+        nativeCommand = "sbt";
+        checksum = "sbt";
+        lockVersions = [ 3 ];
+      };
+    in
+    pkgs.writeShellApplication {
+      name = "sbt-implementation-lifecycle";
+      runtimeInputs = [
+        pkgs.nix
+        pkgs.git
+        pkgs.python3
+      ];
+      text = ''
+        exec python ${./implementation-lifecycle.py} \
+          --baseline ${./implementation-baseline.json} \
+          --bootstrap ${bootstrap.tool} --source-model ${bootstrap.sourceModel} "$@"
+      '';
+    };
   implementation-mode =
     pkgs.runCommand "sbt-purifier-implementation-mode" { nativeBuildInputs = [ pkgs.python3 ]; }
       ''

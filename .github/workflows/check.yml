@@ -258,3 +258,37 @@ jobs:
             ${{ runner.temp }}/sbt-runtime-evidence/crash-reports/*
           if-no-files-found: error
           retention-days: 14
+
+  implementation-lifecycle:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-latest, ubuntu-24.04-arm, macos-15]
+        fixture: [multi, sbt2]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31
+        with:
+          extra_nix_config: |
+            sandbox = true
+      - name: Two immutable implementations through native sbt and loaded plugin
+        env:
+          SOURCE_REV: ${{ github.event.pull_request.head.sha || github.sha }}
+          FIXTURE: ${{ matrix.fixture }}
+        run: |
+          system=$(nix eval --impure --raw --expr builtins.currentSystem)
+          nix run ".#checks.$system.implementation-lifecycle-driver" -- \
+            --current "github:nix-purifiers/sbt-purifier/$SOURCE_REV" \
+            --fixture "$PWD/tests/fixtures/$FIXTURE" \
+            --workdir "$RUNNER_TEMP/sbt-implementation"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: sbt-implementation-${{ matrix.runner }}-${{ matrix.fixture }}
+          path: ${{ runner.temp }}/sbt-implementation
+          if-no-files-found: warn
