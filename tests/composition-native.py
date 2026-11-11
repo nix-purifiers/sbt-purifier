@@ -14,10 +14,10 @@ def compose(args, evidence):
     revision = evidence.output(['git', '-C', str(root), 'rev-parse', 'HEAD'], text=True).strip()
     assert not evidence.output(['git', '-C', str(root), 'diff', '--binary', 'HEAD'], text=True).strip(), \
         'composition evidence requires committed producer source'
-    reference = 'git+file://' + str(root) + '?rev=' + revision
+    producer_reference = 'git+' + root.as_uri() + '?rev=' + revision
     lock_bytes = (root / 'flake.lock').read_bytes()
     archived = json.loads(evidence.output(
-        ['nix', 'flake', 'archive', '--json', '--no-update-lock-file', reference], text=True))
+        ['nix', 'flake', 'archive', '--json', '--no-update-lock-file', producer_reference], text=True))
     snapshot = archived['path']
     def check_archived_inputs(node):
         path = Path(node['path'])
@@ -44,22 +44,22 @@ def compose(args, evidence):
     evidence.receipt['sandbox'] = evidence.output(['nix', 'config', 'show', 'sandbox'], text=True).strip()
     assert evidence.receipt['sandbox'] == 'true', 'composition builds require Nix sandbox'
     evidence.save()
-    print(json.dumps({'producerSource': {'revision': revision, 'reference': reference,
+    print(json.dumps({'producerSource': {'revision': revision, 'reference': producer_reference,
         'path': snapshot, 'narHash': source_nar_hash}, 'system': system, 'sbtVersion': args.sbt_version}), flush=True)
     with tempfile.TemporaryDirectory(prefix='sbt-native-composition-') as temporary, evidence.case():
         temporary = Path(temporary)
-        package = evidence.output(['nix', 'build', 'path:' + snapshot + '#sbt',
+        package = evidence.output(['nix', 'build', producer_reference + '#sbt',
             '--print-out-paths', '--out-link', str(temporary / 'wrapper')], text=True).strip().splitlines()[-1]
         evidence.selected('wrapper', package)
         sbt = Path(package) / 'bin/sbt'
         evidence.receipt['wrapperSha256'] = sha256(sbt)
-        provider = evidence.output(['nix', 'eval', '--raw', 'path:' + snapshot + '#checks.' + system + '.composition-producer.outPath'], text=True).strip()
+        provider = evidence.output(['nix', 'eval', '--raw', producer_reference + '#checks.' + system + '.composition-producer.outPath'], text=True).strip()
         project = temporary / 'native-project'
         (project / 'project').mkdir(parents=True)
         (project / 'project/build.properties').write_text('sbt.version=' + args.sbt_version + '\n')
-        reference = 'path:' + snapshot + '#checks.' + system + '.composition-producer'
+        provider_reference = producer_reference + '#checks.' + system + '.composition-producer'
         (project/'build.sbt').write_text('''ThisBuild / scalaVersion := "2.12.20"
-    ThisBuild / nixFlakeRepositories += NixFlakeRepository("lang3", '''+json.dumps(reference)+''')
+    ThisBuild / nixFlakeRepositories += NixFlakeRepository("lang3", '''+json.dumps(provider_reference)+''')
     organization := "example"
     name := "native-input-consumer"
     version := "1.0.0"
@@ -200,7 +200,7 @@ def compose(args, evidence):
         # Resolve the deployed descriptors with an ordinary Maven client. This
         # also requires uploaded parent/BOM POMs, not just the project JARs.
         expression = """let
-          f = builtins.getFlake ("path:" + builtins.getEnv "COMPOSITION_FLAKE");
+          f = builtins.getFlake (builtins.getEnv "COMPOSITION_FLAKE");
           p = f.inputs.nixpkgs.legacyPackages.${builtins.currentSystem};
         in p.runCommand "sbt-composition-downstream-tools" {} ''
           mkdir -p "$out/bin"
@@ -209,7 +209,7 @@ def compose(args, evidence):
         '' """
         tools = Path(evidence.output(['nix', 'build', '--impure', '--print-out-paths',
             '--out-link', str(temporary / 'maven-tools'), '--expr', expression], text=True,
-            env=dict(os.environ, COMPOSITION_FLAKE=snapshot)).strip())
+            env=dict(os.environ, COMPOSITION_FLAKE=producer_reference)).strip())
         evidence.selected('ordinary-maven-tools', tools)
         downstream = temporary / 'ordinary-downstream'
         downstream.mkdir()

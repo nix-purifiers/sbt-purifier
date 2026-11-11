@@ -89,7 +89,7 @@ def run_sample(args, runtime_root, short_runtime):
     receipt['sourceRevision'] = run('source-revision', ['git', 'rev-parse', 'HEAD'])
     receipt['sourceDiff'] = run('source-diff', ['git', 'diff', '--binary', 'HEAD'])
     assert not receipt['sourceDiff'], 'runtime evidence requires a committed producer source'
-    receipt['sourceReference'] = 'git+file://' + str(root) + '?rev=' + receipt['sourceRevision']
+    receipt['sourceReference'] = 'git+' + root.as_uri() + '?rev=' + receipt['sourceRevision']
     archived = json.loads(run('source-archive', ['nix', 'flake', 'archive', '--json',
         '--no-update-lock-file', receipt['sourceReference']], machine=True))
     snapshot = archived['path']
@@ -108,19 +108,19 @@ def run_sample(args, runtime_root, short_runtime):
     save()
     assert receipt['sandbox'] == 'true', 'Nix sandbox must be enabled'
     tools_expr = '''let
-      f = builtins.getFlake "path:SNAPSHOT";
+      f = builtins.getFlake SOURCE_REFERENCE;
       p = f.inputs.nixpkgs.legacyPackages.SYSTEM;
     in p.runCommand "sbt-native-control-tools" {} ''
       mkdir -p $out/bin
       ln -s ${p.sbt}/bin/sbt $out/bin/sbt
       ln -s ${p.jdk.home} $out/jdk
-    '' '''.replace('SNAPSHOT', snapshot).replace('SYSTEM', system)
+    '' '''.replace('SOURCE_REFERENCE', json.dumps(receipt['sourceReference'])).replace('SYSTEM', system)
     tools = Path(run('native-tools', ['nix', 'build', '--impure', '--expr', tools_expr,
                 '--out-link', work / 'native-tools', '--print-out-paths'], machine=True).splitlines()[-1])
     run('java-version', [tools / 'jdk/bin/java', '-version'])
-    wrapper = Path(run('wrapper', ['nix', 'build', 'path:' + snapshot + '#sbt',
+    wrapper = Path(run('wrapper', ['nix', 'build', receipt['sourceReference'] + '#sbt',
                 '--out-link', work / 'wrapper', '--print-out-paths'], machine=True).splitlines()[-1])
-    purifier = Path(run('purifier', ['nix', 'build', 'path:' + snapshot + '#sbt-purifier',
+    purifier = Path(run('purifier', ['nix', 'build', receipt['sourceReference'] + '#sbt-purifier',
                  '--out-link', work / 'purifier', '--print-out-paths'], machine=True).splitlines()[-1])
     project = work / 'project'
     if args.fixture == 'independent':
@@ -262,7 +262,7 @@ def run_sample(args, runtime_root, short_runtime):
           ${p.lib.concatStrings (p.lib.mapAttrsToList (id: package: "ln -s ${package} $out/${id}\n") socketChecked)}
         ''"""
     (build / 'flake.nix').write_text('''{
-      inputs.purifier.url = "path:SNAPSHOT";
+      inputs.purifier.url = SOURCE_REFERENCE;
       inputs.nixpkgs.follows = "purifier/nixpkgs";
       outputs = { self, purifier, nixpkgs }: let
         system = "SYSTEM";
@@ -270,7 +270,7 @@ def run_sample(args, runtime_root, short_runtime):
         b = p.sbt-purifier.buildSbtProject { src = ./project; doCheck = true; };
         SOCKET_BINDINGS
       in { packages.${system} = PACKAGE_SET // { default = PURE_TESTS; }; };
-    }'''.replace('SNAPSHOT', snapshot).replace('SYSTEM', system)
+    }'''.replace('SOURCE_REFERENCE', json.dumps(receipt['sourceReference'])).replace('SYSTEM', system)
        .replace('SOCKET_BINDINGS', socket_bindings).replace('PURE_TESTS', pure_tests)
        .replace('PACKAGE_SET', 'socketChecked' if socket_bindings else '{}'))
     shutil.copyfile(build / 'flake.nix', results / 'sample-build.nix')
@@ -293,7 +293,7 @@ def run_sample(args, runtime_root, short_runtime):
         '--json', str(work / 'pure-result')], machine=True))
     run('pure-derivation-json', ['nix', 'derivation', 'show', receipt['derivation']])
     if args.fixture == 'independent' and args.sbt_version == '1.13.1':
-        check = 'path:' + snapshot + '#checks.' + system + '.independent-sample-offline-tasks'
+        check = receipt['sourceReference'] + '#checks.' + system + '.independent-sample-offline-tasks'
         receipt['offlineTaskCheck'] = check
         receipt['offlineTaskDerivation'] = run('offline-task-derivation',
             ['nix', 'eval', '--raw', check + '.drvPath'], machine=True)
