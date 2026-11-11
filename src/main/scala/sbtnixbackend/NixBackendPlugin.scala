@@ -92,6 +92,7 @@ object NixBackendPlugin extends AutoPlugin {
         "their runtime dependencies."
     )
     val nixLockUpdate = taskKey[File]("Like nixRelock, and also locks every flake repository afresh.")
+    val nixImplementationRelock = taskKey[File]("Refresh purifier metadata without resolving project dependencies.")
     val nixPublishArtifacts =
       taskKey[File]("Sandbox: publishes packagedArtifacts as a Maven repository under SBT_NIX_OUTPUT.")
     val nixPublishRepository = taskKey[File](
@@ -278,6 +279,30 @@ object NixBackendPlugin extends AutoPlugin {
 
   def pluginVersion: String = pluginCoordinates.map(_.version).getOrElse("(from source)")
 
+  private def requirePinnedPlugin(pin: Json): Unit = {
+    ImplementationPin.requireMatch(pin, ImplementationPin.installed)
+    // Checking an environment marker alone would let a separately declared
+    // Maven plugin claim the wrapper's identity. Compare the loaded jar with
+    // the actual plugin repository supplied by the selected wrapper.
+    val matching = for {
+      coordinates <- pluginCoordinates
+      repository <- environmentRepository
+      code <- Option(getClass.getProtectionDomain.getCodeSource)
+      jar = new File(code.getLocation.toURI)
+      if jar.isFile
+      organization = coordinates.organization.split('.').foldLeft(repository)((dir, segment) => new File(dir, segment))
+      modules = Option(organization.listFiles()).toVector.flatten.filter(_.isDirectory)
+      if modules.exists { module =>
+        val name = module.getName
+        val expected = new File(new File(module, coordinates.version), name + "-" + coordinates.version + ".jar")
+        (name == coordinates.name || name.startsWith(coordinates.name + "_")) &&
+          expected.isFile && Lock.sriHash(expected) == Lock.sriHash(jar)
+      }
+    } yield true
+    if (!matching.getOrElse(false))
+      sys.error("sbt-purifier: loaded plugin bytes differ from the pinned wrapper's plugin repository; use its sbt wrapper")
+  }
+
   /** Follow cache symlinks: Nix may supply a published Maven artifact too.
     * A classes directory belongs to a source build, not Maven resolution.
     */
@@ -389,6 +414,9 @@ object NixBackendPlugin extends AutoPlugin {
     nixBackend := {
       val log = sLog.value
       val lockFile = nixLockFile.value
+      val disabled = sys.env.get("SBT_NIX_BACKEND").exists(value => value == "0" || value == "false")
+      if (Mode.current == Mode.Interactive && !disabled && lockFile.isFile)
+        Lock.read(lockFile).implementation.foreach(requirePinnedPlugin)
       sys.env.get("SBT_NIX_BACKEND") match {
         case Some("0") | Some("false")                      => false
         case _ if Mode.current != Mode.Interactive          => false
@@ -426,7 +454,8 @@ object NixBackendPlugin extends AutoPlugin {
     nixNixpkgs := sys.props.get("sbt.nix.backend.nixpkgs").filter(_.nonEmpty).getOrElse("flake:nixpkgs"),
     nixLock := Compat.uncached(lockTask(force = false, updateFlakes = false).value),
     nixRelock := Compat.uncached(lockTask(force = true, updateFlakes = false).value),
-    nixLockUpdate := Compat.uncached(lockTask(force = true, updateFlakes = true).value)
+    nixLockUpdate := Compat.uncached(lockTask(force = true, updateFlakes = true).value),
+    nixImplementationRelock := Compat.uncached(implementationRelockTask.value)
   ) ++ ResolutionSupport.buildSettings
 
   override def projectSettings: Seq[Setting[_]] = passOnSettings ++ Compat.ivyMirrorSettings(ivyMirror) ++ ResolutionSupport.projectSettings ++ Seq(
@@ -821,6 +850,22 @@ object NixBackendPlugin extends AutoPlugin {
     )
   })
 
+  private def implementationRelockTask: Def.Initialize[Task[File]] = Def.task(Compat.uncached {
+    val in = lockInputs(updateFlakes = false).value
+    val file = (ThisBuild / nixLockFile).value
+    if (Mode.current != Mode.Interactive) sys.error("sbt-purifier: implementation updates run outside the sandbox")
+    val previous = Lock.read(file)
+    if (previous.definitionHash != Lock.buildDefinitionHash(in.buildRoot, Nil) || previous.sbtVersion != in.sbtVersion ||
+        previous.javaVersion != Lock.javaMajor(System.getProperty("java.version")))
+      sys.error("sbt-purifier: the project or toolchain changed; lock its dependencies before updating the purifier")
+    val pin = previous.implementation.getOrElse(sys.error("sbt-purifier: implementation migration requires a staged pin"))
+    requirePinnedPlugin(pin)
+    // Do not run a fresh dependency resolver: dynamic versions and snapshots
+    // must retain their existing captured bytes during an implementation update.
+    previous.copy(plugin = in.plugin, inputsHash = in.inputsHash, implementation = Some(pin)).write(file)
+    file
+  })
+
   private def lockTask(force: Boolean, updateFlakes: Boolean): Def.Initialize[Task[File]] = Def.task(Compat.uncached {
     val log = streams.value.log
     val in = lockInputs(updateFlakes).value
@@ -834,7 +879,19 @@ object NixBackendPlugin extends AutoPlugin {
     if (!force && fresh) {
       log.info(s"[sbt-nix-backend] $lockFile is up to date")
     } else {
-      val lock = LockGeneration.run(in, log.info(_), log.warn(_))
+      val pin = existing.flatMap(_.implementation).orElse {
+        if (existing.isDefined) None
+        else {
+          val active = ImplementationPin.installed
+          if (active.isEmpty && sys.env.get("SBT_PURIFIER_IMPLEMENTATION_CONFIG").exists(_.nonEmpty))
+            sys.error("sbt-purifier: this installation has no portable source identity; lock with a committed, published purifier revision")
+          if (active.isEmpty)
+            log.warn("sbt-purifier: this lock does not pin the purifier implementation; use the sbt wrapper and explicitly run `sbt-purifier self-update --to installed`")
+          active
+        }
+      }
+      pin.foreach(requirePinnedPlugin)
+      val lock = LockGeneration.run(in, log.info(_), log.warn(_)).copy(implementation = pin)
       lock.write(lockFile)
       log.info(s"[sbt-nix-backend] wrote $lockFile (${lock.artifacts.size} artifacts)")
     }

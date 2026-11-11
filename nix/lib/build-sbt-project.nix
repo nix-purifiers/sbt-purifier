@@ -47,6 +47,7 @@
   # dependencies. It is null outside the scope; a lock that needs the
   # plugin then needs `pluginRepository`.
   plugin-repository ? null,
+  implementation ? null,
 }:
 {
   # The root of the sbt build.
@@ -421,6 +422,14 @@ let
     rm -rf $out/nix-support
   '';
 in
+assert
+  (lock.implementation or null) == null
+  || (
+    if implementation == null then
+      throw "sbt-purifier: a pinned project requires the implementation-aware overlay"
+    else
+      implementation.check lock.implementation true
+  );
 {
   inherit
     lock

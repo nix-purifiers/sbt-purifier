@@ -294,6 +294,53 @@ let
 
 in
 {
+  implementation-lifecycle-driver =
+    let
+      bootstrap = pkgs.callPackage flakeLib.purifier.implementation {
+        source = { };
+        repository = "nix-purifiers/sbt-purifier";
+        tool = "sbt-purifier";
+        nativeCommand = "sbt";
+        checksum = "sbt";
+        lockVersions = [ 3 ];
+      };
+    in
+    pkgs.writeShellApplication {
+      name = "sbt-implementation-lifecycle";
+      runtimeInputs = [
+        pkgs.nix
+        pkgs.git
+        pkgs.python3
+      ];
+      text = ''
+        exec python ${./implementation-lifecycle.py} \
+          --baseline ${./implementation-baseline.json} \
+          --bootstrap ${bootstrap.tool} --source-model ${bootstrap.sourceModel} "$@"
+      '';
+    };
+  implementation-lock-path = pkgs.runCommand "sbt-purifier-implementation-lock-path" { } ''
+    mkdir -p stub
+    cat > stub/realpath <<'SH'
+    #!${pkgs.runtimeShell}
+    exit 77
+    SH
+    chmod +x stub/realpath
+    status=0
+    PATH="$PWD/stub:$PATH" ${withOverlay.sbt-purifier.sbt-purifier}/bin/sbt-purifier \
+      invalid-action --lockfile missing/../external/lock.json >stdout 2>stderr || status=$?
+    test "$status" = 2
+    grep -F 'usage: sbt-purifier' stderr
+    touch "$out"
+  '';
+  implementation-mode =
+    pkgs.runCommand "sbt-purifier-implementation-mode" { nativeBuildInputs = [ pkgs.python3 ]; }
+      ''
+        mkdir -p tests nix/lib
+        cp ${./test_implementation_mode.py} tests/test_implementation_mode.py
+        cp ${../nix/lib/implementation-mode.py} nix/lib/implementation-mode.py
+        python -B tests/test_implementation_mode.py
+        touch "$out"
+      '';
   jvm-maven-projection = multi.packages.javalib.projections.maven;
   jvm-ivy-projection = ivy.packages.ivyjava.projections.maven;
 

@@ -87,7 +87,8 @@ final case class Lock(
     artifacts: Vector[LockedArtifact],
     inputsHash: String,
     definitionHash: String,
-    buildDirectory: Option[String] = None
+    buildDirectory: Option[String] = None,
+    implementation: Option[Json] = None
 ) {
   def toJson: Json = {
     import Json._
@@ -127,7 +128,8 @@ final case class Lock(
         obj("path" -> str(a.path), "url" -> str(a.url), "mirrors" -> Arr(a.mirrors.map(str)), "hash" -> str(a.hash))
       })
     )
-    buildDirectory.fold(base)(directory => Obj(base.asObject.fields :+ ("buildDirectory" -> str(directory))))
+    val located = buildDirectory.fold(base)(directory => Obj(base.asObject.fields :+ ("buildDirectory" -> str(directory))))
+    implementation.fold(located)(pin => Obj(located.asObject.fields :+ ("implementation" -> pin)))
   }
 
   /** The text of the lockfile, with its content hash (see [[Lock.parse]]). */
@@ -235,7 +237,8 @@ object Lock {
       },
       inputsHash = o("inputsHash").asString,
       definitionHash = o("definitionHash").asString,
-      buildDirectory = o.get("buildDirectory").map(_.asString)
+      buildDirectory = o.get("buildDirectory").map(_.asString),
+      implementation = o.get("implementation").map(ImplementationPin.validate)
     )
   }
 

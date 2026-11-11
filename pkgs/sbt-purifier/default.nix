@@ -24,15 +24,17 @@
   pkgs,
   writeShellScriptBin,
   sbt,
+  implementation,
 }:
 let
   nixLib = ../../nix/lib;
 in
 writeShellScriptBin "sbt-purifier" ''
   set -euo pipefail
+  originalArgs=("$@")
 
   usage() {
-    echo "usage: sbt-purifier <lock|update|prefetch|publish> [--lockfile <path>] [sbt arguments...]" >&2
+    echo "usage: sbt-purifier <lock|update|prefetch|publish|implementation|self-update> [--lockfile <path>] [arguments...]" >&2
     exit 2
   }
 
@@ -44,7 +46,7 @@ writeShellScriptBin "sbt-purifier" ''
     case $1 in
       --lockfile)
         [ $# -ge 2 ] || usage
-        SBT_PURIFIER_LOCKFILE=$(realpath -m "$2")
+        SBT_PURIFIER_LOCKFILE=$(${pkgs.coreutils}/bin/realpath -m "$2")
         export SBT_PURIFIER_LOCKFILE
         shift 2
         ;;
@@ -55,6 +57,19 @@ writeShellScriptBin "sbt-purifier" ''
     esac
   done
   lockfile=''${SBT_PURIFIER_LOCKFILE:-$PWD/sbt-purifier.lock.json}
+  if [ "$command" = self-update ]; then
+    exec ${pkgs.python3}/bin/python ${implementation.tool} self-update \
+      --config ${implementation.manifest} --lockfile "$lockfile" \
+      --installed-command "$0" "''${args[@]}"
+  fi
+  selected="$(${pkgs.python3}/bin/python ${implementation.tool} dispatch \
+    --config ${implementation.manifest} --lockfile "$lockfile" --entry sbt-purifier)"
+  if [ -n "$selected" ]; then exec "$selected" "''${originalArgs[@]}"; fi
+  export SBT_PURIFIER_IMPLEMENTATION_CONFIG=${implementation.manifest}
+  if [ "$command" = implementation ]; then
+    exec ${pkgs.python3}/bin/python ${implementation.tool} current \
+      --config ${implementation.manifest} --lockfile "$lockfile"
+  fi
 
   # The problems readLock finds in the lockfile, one per line, each
   # naming the command that fixes it.
@@ -74,6 +89,9 @@ writeShellScriptBin "sbt-purifier" ''
   }
 
   case $command in
+    implementation-relock)
+      exec ${lib.getExe sbt} --server -batch "''${args[@]}" nixImplementationRelock
+      ;;
     lock)
       exec ${lib.getExe sbt} -batch "''${args[@]}" nixLock
       ;;

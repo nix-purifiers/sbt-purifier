@@ -39,7 +39,7 @@ The wrapper supplies the plugin through Nix. Commit
 `sbt-purifier.lock.json` after locking. To add the plugin to an existing
 sbt installation instead, see [From the Maven repository](#from-the-maven-repository).
 
-For persistent use, add the wrapper through your usual Nix configuration.
+Install the wrapper through your usual Nix configuration.
 
 ## Development loop
 
@@ -92,6 +92,29 @@ URLs, with Google's mirror of Maven Central among their mirrors:
 SBT_NIX_BACKEND_MAVEN_CENTRAL_MIRROR=https://maven-central.storage-download.googleapis.com/maven2/ \
   sbt nixLock
 ```
+
+### Updating sbt-purifier
+
+Locks created through the wrapper pin sbt-purifier's source revision and hash,
+selecting the wrapper and its plugin together. Updating the installed wrapper or
+running `sbt-purifier update` preserves this pin. To change it explicitly:
+
+```sh
+sbt-purifier self-update --to installed
+```
+
+Use `--to github:nix-purifiers/sbt-purifier/REV` to select a published revision.
+The selected implementation relocks a staged copy before replacing the project
+lock. `sbt-purifier implementation` prints its identity. Existing unpinned locks
+warn until explicitly migrated. Use an implementation-aware wrapper for pinned
+projects: a separately loaded plugin cannot switch its own implementation and
+rejects a mismatch. Projects need no flake.
+
+Pinned projects run in sbt's foreground mode so an existing daemon cannot keep
+an older plugin after a pin changes. `--client`, `--jvm-client` and
+`SBT_NATIVE_CLIENT=true` are rejected while the pin is active. Ordinary commands
+such as `sbt test` work unchanged; reusing a long-lived sbt server is not yet
+supported for pinned projects.
 
 ### Resolving the plugin through Nix
 
@@ -181,7 +204,7 @@ runs sbt with ordinary, impure dependency resolution. Create the lock with
 ## Building the project with Nix
 
 Once the native development workflow is working, you can also build and
-test the whole project in the Nix sandbox. For this step, keep a flake or
+test the project in the Nix sandbox. For this step, keep a flake or
 another Nix build definition in the project's repository, or maintain an
 external packaging repository that points at its sources and lockfiles.
 The builder consumes the same lockfiles as the development workflow.
@@ -200,9 +223,14 @@ can live in the project's repository or in another one:
     { nixpkgs, sbt-purifier, ... }:
     let
       system = "x86_64-linux";
+      pin = (builtins.fromJSON
+        (builtins.readFile ./sbt-purifier.lock.json)).implementation;
+      selected =
+        (sbt-purifier.lib.purifier.implementationSource.resolve
+          pin.source).flake;
       pkgs = import nixpkgs {
         inherit system;
-        overlays = [ sbt-purifier.overlays.default ];
+        overlays = [ selected.overlays.default ];
       };
       build = pkgs.sbt-purifier.buildSbtProject {
         src = ./.;
@@ -306,7 +334,12 @@ project root. Replace the example package name with one from your project:
 
 ```zsh
 nix build --impure --expr 'let
-  sbt-purifier = builtins.getFlake "github:nix-purifiers/sbt-purifier";
+  bootstrap = builtins.getFlake "github:nix-purifiers/sbt-purifier";
+  pin = (builtins.fromJSON
+    (builtins.readFile ./sbt-purifier.lock.json)).implementation;
+  sbt-purifier =
+    (bootstrap.lib.purifier.implementationSource.resolve
+      pin.source).flake;
   pkgs = import sbt-purifier.inputs.nixpkgs {
     system = builtins.currentSystem;
     overlays = [ sbt-purifier.overlays.default ];

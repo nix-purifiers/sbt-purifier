@@ -9,5 +9,19 @@
 # by default.
 { closure-lib, ... }:
 {
-  overlay = closure-lib.caisson.nixpkgs.mkPackagesOverlay ../../pkgs "sbt-purifier";
+  overlay = closure-lib.caisson.nixpkgs.mkPackagesOverlay (
+    args@{ callPackage, lib, ... }:
+    import ../../pkgs (
+      args
+      // {
+        implementationSource = closure-lib.caisson.libManifest.root // {
+          dirty =
+            (closure-lib.caisson.libManifest.root.dirty or false)
+            || builtins.any (input: input.pin.overridden or false) (
+              builtins.attrValues closure-lib.caisson.libManifest.sources
+            );
+        };
+      }
+    )
+  ) "sbt-purifier";
 }

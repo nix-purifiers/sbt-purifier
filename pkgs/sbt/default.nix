@@ -28,6 +28,7 @@
   writeTextFile,
   pluginRepository,
   pluginVersion,
+  implementation,
 }:
 let
   injectText = ''
@@ -58,6 +59,33 @@ writeTextFile {
   text = ''
     #!${runtimeShell}
     set -eu
+    lockfile=''${SBT_PURIFIER_LOCKFILE:-sbt-purifier.lock.json}
+    implementation_pinned=0
+    case "''${SBT_NIX_BACKEND:-1}" in
+      0 | false) ;;
+      *)
+        selected="$(${pkgs.python3}/bin/python ${implementation.tool} dispatch \
+          --config ${implementation.manifest} --lockfile "$lockfile" --entry sbt)"
+        if [ -n "$selected" ]; then exec "$selected" "$@"; fi
+        export SBT_PURIFIER_IMPLEMENTATION_CONFIG=${implementation.manifest}
+        if [ -f "$lockfile" ]; then
+          implementation_pinned="$(${pkgs.python3}/bin/python - "$lockfile" <<'PY'
+    import json, sys
+    print(1 if json.load(open(sys.argv[1])).get("implementation") is not None else 0)
+    PY
+          )"
+        fi
+        ;;
+    esac
+    if [ "$implementation_pinned" = 1 ]; then
+      ${pkgs.python3}/bin/python ${../../nix/lib/implementation-mode.py} \
+        --sbt-home ${pkgs.sbt}/share/sbt -- "$@"
+      # sbt 2 defaults to an existing daemon, whose plugin and environment
+      # cannot be replaced by changing a client process. Keep the ordinary
+      # command in a fresh foreground JVM. This flag is consumed by the runner,
+      # including when project/build.properties selects an older sbt SDK.
+      set -- "$@" --server
+    fi
     wanted=$(sed -n 's/^[[:space:]]*sbt\.version[[:space:]]*=[[:space:]]*\([^[:space:]]*\).*/\1/p' project/build.properties 2>/dev/null || true)
     legacy=0
     inject=${inject}
