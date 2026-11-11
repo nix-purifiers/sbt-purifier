@@ -318,6 +318,29 @@ in
           --bootstrap ${bootstrap.tool} --source-model ${bootstrap.sourceModel} "$@"
       '';
     };
+  implementation-override-guards =
+    let
+      scope = withOverlay.sbt-purifier;
+      metadataOnly = scope.sbt.overrideAttrs (old: {
+        meta = (old.meta or { }) // {
+          priority = 7;
+        };
+      });
+      customCoreutils = pkgs.coreutils.overrideAttrs (old: {
+        pname = old.pname + "-unrecorded";
+      });
+    in
+    assert !(builtins.tryEval ((scope.sbt.override { pluginVersion = "unrecorded"; }).drvPath)).success;
+    assert
+      !(builtins.tryEval (
+        (scope.sbt-purifier.override {
+          pkgs = pkgs // {
+            coreutils = customCoreutils;
+          };
+        }).drvPath
+      )).success;
+    assert metadataOnly.drvPath == scope.sbt.drvPath && metadataOnly.meta.priority == 7;
+    pkgs.runCommand "sbt-implementation-override-guards" { } "touch $out";
   implementation-lock-path = pkgs.runCommand "sbt-purifier-implementation-lock-path" { } ''
     mkdir -p stub
     cat > stub/realpath <<'SH'
