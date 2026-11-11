@@ -6,10 +6,14 @@
   callPackage,
   lib,
   implementationSource,
+  implementationNixpkgs,
+  implementationLib,
   ...
 }:
 let
-  implementation = callPackage lib.purifier.implementation {
+  pkgs = callPackage ({ pkgs }: pkgs) { };
+  canonicalPkgs = import implementationNixpkgs { system = pkgs.stdenv.hostPlatform.system; };
+  implementation = canonicalPkgs.callPackage implementationLib.purifier.implementation {
     source = implementationSource;
     repository = "nix-purifiers/sbt-purifier";
     tool = "sbt-purifier";
@@ -17,6 +21,36 @@ let
     checksum = "sbt";
     lockVersions = [ 3 ];
   };
+  # Scope overrides happen before the shared outer override guard. Compare
+  # the actual constructor recipe with the source-owned default before it
+  # can execute or advertise a portable identity. Reject unknown changes;
+  # relabeling just the CLI cannot also rebind its delegated native wrapper.
+  wrapDefault =
+    file: actualArgs: defaultArgs:
+    let
+      candidate = callPackage file (actualArgs // { inherit implementation; });
+      expected = canonicalPkgs.callPackage file (defaultArgs // { inherit implementation; });
+    in
+    if candidate.drvPath == expected.drvPath then
+      implementation.wrap candidate
+    else
+      throw "sbt-purifier: this scope changes the source-owned wrapper recipe; use the source exported packages for implementation pins";
+  pluginVersion = builtins.replaceStrings [ "\n" ] [ "" ] (builtins.readFile ../version.txt);
+  canonicalBuilder = canonicalPkgs.callPackage ../nix/lib/build-sbt-project.nix {
+    inherit implementation;
+    inherit (implementationLib) purifier;
+    inherit (implementationLib.sbt-purifier) readLock;
+  };
+  canonicalPlugin = canonicalPkgs.callPackage ../nix/lib/plugin.nix {
+    lib = implementationLib;
+    buildSbtProject = canonicalBuilder;
+  };
+  canonicalSbt = implementation.wrap (
+    canonicalPkgs.callPackage ./sbt {
+      inherit implementation pluginVersion;
+      pluginRepository = canonicalPlugin.repository;
+    }
+  );
   # The builder of the purifier contract (nix/lib/build-sbt-project.nix).
   buildSbtProject = callPackage ../nix/lib/build-sbt-project.nix {
     inherit implementation;
@@ -33,16 +67,18 @@ in
   # plugin from.
   plugin-repository = plugin.repository;
   # sbt with the plugin injected.
-  sbt = implementation.wrap (
-    callPackage ./sbt {
-      inherit implementation;
-      pluginRepository = plugin.repository;
-      # The version of builds from source, which build.sbt reads too.
-      pluginVersion = builtins.replaceStrings [ "\n" ] [ "" ] (builtins.readFile ../version.txt);
-    }
-  );
+  sbt =
+    wrapDefault ./sbt
+      {
+        inherit pluginVersion;
+        pluginRepository = plugin.repository;
+      }
+      {
+        inherit pluginVersion;
+        pluginRepository = canonicalPlugin.repository;
+      };
 }
 // {
   # The commands of the purifier contract: lock, update, prefetch, publish.
-  sbt-purifier = implementation.wrap (callPackage ./sbt-purifier { inherit implementation; });
+  sbt-purifier = wrapDefault ./sbt-purifier { } { sbt = canonicalSbt; };
 }
