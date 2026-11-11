@@ -298,6 +298,7 @@ def main():
         assert Path(matched).is_dir()
         receipt["matchedBuild"] = matched
         receipt["matchedDerivation"] = run("matched-A-deriver", ["nix-store", "--query", "--deriver", matched])[1].strip()
+        receipt["matchedOutputInfo"] = json.loads(run("matched-A-output-info", ["nix", "path-info", "--json", matched])[1])
         code, stdout, stderr = run("mismatched-B-builder", ["nix", "eval", "--impure", "--raw", "--expr",
                                   "(" + build_expression(source_b) + ").drvPath"], success=False)
         assert code and "builder implementation differs" in stdout + stderr
