@@ -209,10 +209,23 @@ other_wrapper=$(nix build --no-link --print-out-paths --impure --argstr root "$r
     system = builtins.currentSystem;
     pkgs = flake.inputs.nixpkgs.legacyPackages.${system};
     sbt = flake.packages.${system}.sbt;
+    # This deliberately rebuilt repository is not the source default
+    # implementation. Construct an unpinned test wrapper instead of claiming
+    # that an arbitrary outer override preserves the portable identity.
+    implementation = pkgs.callPackage flake.lib.purifier.implementation {
+      source = { };
+      repository = "nix-purifiers/sbt-purifier";
+      tool = "sbt-purifier";
+      nativeCommand = "sbt";
+      checksum = "sbt";
+      lockVersions = [ 3 ];
+    };
   in
-  sbt.override {
+  implementation.wrap (pkgs.callPackage (root + "/pkgs/sbt") {
+    inherit implementation;
+    pluginVersion = builtins.replaceStrings [ "\n" ] [ "" ] (builtins.readFile (root + "/version.txt"));
     pluginRepository = pkgs.runCommand "plugin-repository-copy" { } "cp -r ${sbt.pluginRepository} $out";
-  }')
+  })')
 use_fixture ivy
 location='eval sbtnixbackend.NixBackendPlugin.getClass.getProtectionDomain.getCodeSource.getLocation.toString'
 output=$(run_sbt "$location") || fail "ivy: sbt did not load"
