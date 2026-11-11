@@ -241,7 +241,7 @@ def main():
                 if expected_jar.is_file() and sha(actual_jar) == sha(expected_jar):
                     matches.append({"group": group, "name": name, "version": version, "jar": str(expected_jar)})
             assert matches, "loaded plugin does not match any actual published plugin JAR in the selected repository"
-            assert re.search(r"(?m)^\[info\]\s+" + re.escape(legacy["sbtVersion"]) + r"\s*$", stdout)
+            assert re.search(r"(?m)^\[info\]\s+" + re.escape(legacy["sbtVersion"]) + r"\s*$", re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", stdout))
             receipt.setdefault("origins", {})[label] = dict(rows, loadedJarSha256=sha(actual_jar), matchingPublishedModules=matches)
             save()
 
