@@ -294,6 +294,15 @@ let
 
 in
 {
+  implementation-mode =
+    pkgs.runCommand "sbt-purifier-implementation-mode" { nativeBuildInputs = [ pkgs.python3 ]; }
+      ''
+        mkdir -p tests nix/lib
+        cp ${./test_implementation_mode.py} tests/test_implementation_mode.py
+        cp ${../nix/lib/implementation-mode.py} nix/lib/implementation-mode.py
+        python -B tests/test_implementation_mode.py
+        touch "$out"
+      '';
   jvm-maven-projection = multi.packages.javalib.projections.maven;
   jvm-ivy-projection = ivy.packages.ivyjava.projections.maven;
 

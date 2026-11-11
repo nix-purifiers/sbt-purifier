@@ -19,16 +19,52 @@
   pluginRepository ? "",
 }:
 let
-  pkgs =
+  basePkgs =
     if builtins.substring 0 1 nixpkgs == "/" then
       import nixpkgs { }
     else
       (builtins.getFlake nixpkgs).legacyPackages.${builtins.currentSystem};
-  lib = import ./library.nix { inherit (pkgs) lib; };
-  buildSbtProject = pkgs.callPackage ./build-sbt-project.nix {
-    inherit (lib) purifier;
-    inherit (lib.sbt-purifier) readLock;
-  };
+  lib = import ./library.nix { inherit (basePkgs) lib; };
+  locked = lib.purifier.checkLock (
+    lib.sbt-purifier.readLock (
+      { src = /. + src; } // lib.optionalAttrs (lockFile != "") { lockFile = /. + lockFile; }
+    )
+  );
+  pin =
+    let
+      value = locked.lock.implementation or null;
+    in
+    if value == null then
+      null
+    else if
+      (value.version or null) != 1
+      || (value.tool or null) != "sbt-purifier"
+      ||
+        builtins.attrNames value != [
+          "source"
+          "tool"
+          "version"
+        ]
+    then
+      throw "sbt-purifier: unsupported implementation pin"
+    else
+      value;
+  # The embedded library remains usable by legacy Maven-loaded plugins. A
+  # pinned project loads the selected source with its revision metadata and
+  # uses that source's aware scope, rather than an unidentified store path.
+  pkgs =
+    if pin == null then
+      basePkgs
+    else
+      basePkgs.extend (lib.purifier.implementationSource.resolve pin.source).flake.overlays.default;
+  buildSbtProject =
+    if pin != null then
+      pkgs.sbt-purifier.buildSbtProject
+    else
+      pkgs.callPackage ./build-sbt-project.nix {
+        inherit (lib) purifier;
+        inherit (lib.sbt-purifier) readLock;
+      };
   build = buildSbtProject (
     {
       src = /. + src;

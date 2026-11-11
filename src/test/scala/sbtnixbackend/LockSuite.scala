@@ -6,6 +6,13 @@ import java.nio.file.Files
 
 class LockSuite extends munit.FunSuite {
 
+  test("implementation pin survives the native lock codec and is covered by its hash") {
+    val pin = Json.parse("""{"version":1,"tool":"sbt-purifier","source":{"type":"github","owner":"nix-purifiers","repo":"sbt-purifier","rev":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","narHash":"sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="}}""")
+    val pinned = lock.copy(implementation = Some(pin))
+    assertEquals(Lock.parse(pinned.render).implementation, Some(pin))
+    assert(Lock.contentProblem(pinned.render.replace("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")).nonEmpty)
+  }
+
   private val lock = Lock(
     sbtVersion = "1.11.7",
     javaVersion = "21.0.12",
