@@ -110,6 +110,11 @@ warn until explicitly migrated. Use an implementation-aware wrapper for pinned
 projects: a separately loaded plugin cannot switch its own implementation and
 rejects a mismatch. Projects need no flake.
 
+Use this source's exported wrappers for portable pins. Package and scope
+changes that alter their recipes are rejected rather than claiming the default
+source reproduces custom wrapper code. This guard does not restrict arbitrary
+customizations of the separate project builder.
+
 Pinned projects run in sbt's foreground mode so an existing daemon cannot keep
 an older plugin after a pin changes. `--client`, `--jvm-client` and
 `SBT_NATIVE_CLIENT=true` are rejected while the pin is active. Ordinary commands

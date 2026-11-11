@@ -318,6 +318,72 @@ in
           --bootstrap ${bootstrap.tool} --source-model ${bootstrap.sourceModel} "$@"
       '';
     };
+  implementation-override-guards =
+    let
+      scope = withOverlay.sbt-purifier;
+      metadataOnly = scope.sbt.overrideAttrs (old: {
+        meta = (old.meta or { }) // {
+          priority = 7;
+        };
+      });
+      customCoreutils = pkgs.coreutils.overrideAttrs (old: {
+        pname = old.pname + "-unrecorded";
+      });
+    in
+    assert !(builtins.tryEval ((scope.sbt.override { pluginVersion = "unrecorded"; }).drvPath)).success;
+    assert
+      !(builtins.tryEval (
+        (scope.sbt-purifier.override {
+          pkgs = pkgs // {
+            coreutils = customCoreutils;
+          };
+        }).drvPath
+      )).success;
+    assert metadataOnly.drvPath == scope.sbt.drvPath && metadataOnly.meta.priority == 7;
+    pkgs.runCommand "sbt-implementation-override-guards" { } "touch $out";
+  implementation-scope-guards =
+    let
+      source = {
+        rev = "1111111111111111111111111111111111111111";
+        narHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+      };
+      scope = lib.makeScope pkgs.newScope (
+        self:
+        import ../pkgs {
+          callPackage = self.callPackage;
+          lib = flakeLib;
+          implementationLib = flakeLib;
+          implementationNixpkgs = pkgs.path;
+          implementationSource = source;
+        }
+      );
+      custom =
+        name:
+        scope.overrideScope (
+          final: prev: {
+            pkgs = pkgs // {
+              ${name} = pkgs.${name}.overrideAttrs (old: {
+                pname = old.pname + "-unrecorded";
+              });
+            };
+          }
+        );
+      pythonScope = custom "python3";
+      coreutilsScope = custom "coreutils";
+      customConstructor = scope.overrideScope (
+        final: prev: {
+          writeShellScriptBin = name: text: pkgs.writeShellScriptBin name (text + "\necho changed\n");
+        }
+      );
+      rejected = package: !(builtins.tryEval package.drvPath).success;
+    in
+    assert scope.sbt.implementation.source.rev == source.rev;
+    assert scope.sbt-purifier.implementation.source.rev == source.rev;
+    assert rejected pythonScope.sbt;
+    assert rejected pythonScope.sbt-purifier;
+    assert rejected coreutilsScope.sbt-purifier;
+    assert rejected customConstructor.sbt-purifier;
+    pkgs.runCommand "sbt-implementation-scope-guards" { } "touch $out";
   implementation-lock-path = pkgs.runCommand "sbt-purifier-implementation-lock-path" { } ''
     mkdir -p stub
     cat > stub/realpath <<'SH'
