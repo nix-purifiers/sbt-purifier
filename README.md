@@ -204,7 +204,7 @@ runs sbt with ordinary, impure dependency resolution. Create the lock with
 ## Building the project with Nix
 
 Once the native development workflow is working, you can also build and
-test the whole project in the Nix sandbox. For this step, keep a flake or
+test the project in the Nix sandbox. For this step, keep a flake or
 another Nix build definition in the project's repository, or maintain an
 external packaging repository that points at its sources and lockfiles.
 The builder consumes the same lockfiles as the development workflow.
@@ -223,9 +223,14 @@ can live in the project's repository or in another one:
     { nixpkgs, sbt-purifier, ... }:
     let
       system = "x86_64-linux";
+      pin = (builtins.fromJSON
+        (builtins.readFile ./sbt-purifier.lock.json)).implementation;
+      selected =
+        (sbt-purifier.lib.purifier.implementationSource.resolve
+          pin.source).flake;
       pkgs = import nixpkgs {
         inherit system;
-        overlays = [ sbt-purifier.overlays.default ];
+        overlays = [ selected.overlays.default ];
       };
       build = pkgs.sbt-purifier.buildSbtProject {
         src = ./.;
@@ -329,7 +334,12 @@ project root. Replace the example package name with one from your project:
 
 ```zsh
 nix build --impure --expr 'let
-  sbt-purifier = builtins.getFlake "github:nix-purifiers/sbt-purifier";
+  bootstrap = builtins.getFlake "github:nix-purifiers/sbt-purifier";
+  pin = (builtins.fromJSON
+    (builtins.readFile ./sbt-purifier.lock.json)).implementation;
+  sbt-purifier =
+    (bootstrap.lib.purifier.implementationSource.resolve
+      pin.source).flake;
   pkgs = import sbt-purifier.inputs.nixpkgs {
     system = builtins.currentSystem;
     overlays = [ sbt-purifier.overlays.default ];

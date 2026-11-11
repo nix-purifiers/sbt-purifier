@@ -290,5 +290,7 @@ jobs:
         if: always()
         with:
           name: sbt-implementation-${{ matrix.runner }}-${{ matrix.fixture }}
-          path: ${{ runner.temp }}/sbt-implementation
+          path: |
+            ${{ runner.temp }}/sbt-implementation/receipt.json
+            ${{ runner.temp }}/sbt-implementation/logs
           if-no-files-found: warn
