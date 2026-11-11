@@ -266,7 +266,7 @@ jobs:
         runner: [ubuntu-latest, ubuntu-24.04-arm, macos-15]
         fixture: [multi, sbt2]
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 90
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:

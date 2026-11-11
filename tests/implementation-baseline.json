@@ -1,9 +1,9 @@
 {
   "source": {
-    "narHash": "sha256-oZDPj/lFerizumv1dUdoPWduB7zouT9wcd/Tw7fZs1w=",
+    "narHash": "sha256-88P5ACP7k4kMRnmG4Q0CIvVjSBNU9WmU6zfnqIm81gU=",
     "owner": "nix-purifiers",
     "repo": "sbt-purifier",
-    "rev": "55e6c5a95e02df53a0c523a7dc0ae674de0d7c19",
+    "rev": "4f9013f629553e28385d5d5dcf70affa191e7a86",
     "type": "github"
   }
 }
