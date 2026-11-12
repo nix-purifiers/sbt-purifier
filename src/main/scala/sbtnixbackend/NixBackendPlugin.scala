@@ -1097,9 +1097,45 @@ object NixBackendPlugin extends AutoPlugin {
     }
   }
 
+  private def captureScalafmtSessions(extracted: Extracted, state0: State): State = {
+    var state = state0
+    val seen = scala.collection.mutable.Set.empty[(ClassLoader, File, String, Seq[String], Seq[AnyRef])]
+    extracted.structure.allProjectRefs.foreach { ref =>
+      val project = extracted.get(ref / thisProject)
+      project.autoPlugins.find(_.getClass.getName == "org.scalafmt.sbt.ScalafmtPlugin$").foreach { plugin =>
+        val configs = ((ref / TaskKey[File]("scalafmtConfig")) +:
+          project.configurations.map(c => ref / c / TaskKey[File]("scalafmtConfig"))).distinct
+        configs.foreach { configTask =>
+          if (Compat.hasTask(extracted, configTask)) {
+            val (s1, configured) = extracted.runTask(configTask, state)
+            val config = configured.getCanonicalFile
+            state = s1
+            if (config.isFile) {
+              val resolverTask = Scoped.scopedTask(configTask.scope, fullResolvers.key)
+              val credentialTask = Scoped.scopedTask(configTask.scope, credentials.key)
+              val (s2, resolvers) = extracted.runTask(resolverTask, state)
+              val (s3, configuredCredentials) = extracted.runTask(credentialTask, s2)
+              state = s3
+              val repositories = resolvers.collect { case r: sbt.librarymanagement.MavenRepository => r.root }
+              val nativeCredentials = configuredCredentials.map(_.asInstanceOf[AnyRef])
+              val digest = java.security.MessageDigest.getInstance("SHA-256")
+                .digest(Files.readAllBytes(config.toPath)).map(b => f"${b & 0xff}%02x").mkString
+              if (seen.add((plugin.getClass.getClassLoader, config, digest, repositories, nativeCredentials))) {
+                state.log.info("[sbt-nix-backend] resolving native Scalafmt session " + config)
+                ScalafmtCapture.resolve(plugin, config, repositories, nativeCredentials)
+              }
+            }
+          }
+        }
+      }
+    }
+    state
+  }
+
   private def sandboxBuild(state0: State, extracted: Extracted, flags: Seq[String], ids: Seq[String]): State = {
     val structure = extracted.structure
-    var state = if (Mode.current == Mode.Lock) captureToolClasspaths(extracted, state0) else state0
+    var state = if (Mode.current == Mode.Lock)
+      captureToolClasspaths(extracted, captureScalafmtSessions(extracted, state0)) else state0
     def run[T](key: TaskKey[T]): T = {
       val (s, v) = extracted.runTask(key, state)
       state = s
