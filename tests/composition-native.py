@@ -107,6 +107,14 @@ def compose(args, evidence):
         elif args.sbt_version.startswith('2.'):
             definition.write_text(definition.read_text().replace('2.12.20', '3.8.4'))
         env = dict(os.environ, SBT_NIX_BACKEND_MAVEN_CENTRAL_MIRROR='https://repo.maven.apache.org/maven2/')
+        # This matrix point exercises legacy sbt/Scala on its explicit test
+        # profile. The wrapper itself continues to use the caller's Java.
+        if args.sbt_version.startswith('0.13.'):
+            legacy_home = os.environ.get('SBT_PURIFIER_TEST_LEGACY_JAVA_HOME') or evidence.output(
+                ['nix', 'develop', producer_reference + '#legacy-tests', '--command', 'printenv', 'JAVA_HOME'],
+                text=True).strip()
+            env.update(JAVA_HOME=legacy_home, JAVACMD=str(Path(legacy_home) / 'bin/java'))
+            evidence.receipt['testJvmProfile'] = {'name': 'legacy-tests', 'home': legacy_home}
         def run(*commands):
             output = evidence.output([str(sbt), '-batch', ';' + ';'.join(commands)], cwd=project, env=env, text=True)
             evidence.receipt.setdefault('nativeCommandsPassed', []).append(list(commands))
