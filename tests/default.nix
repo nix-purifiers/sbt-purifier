@@ -468,6 +468,23 @@ in
           original.buildPhase;
     });
 
+  # MiMa resolves previous releases outside the current project's classpath.
+  # Load the returned JAR through an isolated loader in the pure build.
+  mima-session =
+    let
+      project = buildSbtProject {
+        src = ./fixtures/mima-session;
+        pluginRepository = plugin-repository;
+        doCheck = true;
+      };
+      command = "nixSandboxBuild --test mima-session";
+    in
+    project.packages.mima-session.overrideAttrs (original: {
+      buildPhase =
+        assert lib.hasInfix command original.buildPhase;
+        builtins.replaceStrings [ command ] [ ";verifyPrevious;${command}" ] original.buildPhase;
+    });
+
   nix-library = import ./nix-library.nix { inherit pkgs overlay flakeLib; };
 
   # Feature 1: the coursier cache of the multi fixture.
