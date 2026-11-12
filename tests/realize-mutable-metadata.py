@@ -41,7 +41,7 @@ threading.Thread(target=server.serve_forever, daemon=True).start()
 url = f"http://127.0.0.1:{server.server_port}/ivy-realize-mutable-metadata.xml"
 cache_path = f"http/127.0.0.1%3A{server.server_port}/ivy-realize-mutable-metadata.xml"
 lock = state / "lock.json"
-library = args.source.resolve() / "nix/lib/realize.nix"
+library = args.source.resolve() / "pkgs/plugin/nix/realize.nix"
 common = [str(library), "--arg", "lockFile", str(lock)]
 
 

@@ -35,13 +35,13 @@ let
       implementation.wrap candidate
     else
       throw "sbt-purifier: this scope changes the source-owned wrapper recipe; use the source exported packages for implementation pins";
-  pluginVersion = (import ../nix/lib/source-version.nix ../.).version;
-  canonicalBuilder = canonicalPkgs.callPackage ../nix/lib/build-sbt-project.nix {
+  pluginVersion = (import ./plugin/nix/source-version.nix ../.).version;
+  canonicalBuilder = canonicalPkgs.callPackage ./build-sbt-project {
     inherit implementation;
     inherit (implementationLib) purifier;
     inherit (implementationLib.sbt-purifier) readLock;
   };
-  canonicalPlugin = canonicalPkgs.callPackage ../nix/lib/plugin.nix {
+  canonicalPlugin = canonicalPkgs.callPackage ./plugin {
     lib = implementationLib;
     buildSbtProject = canonicalBuilder;
   };
@@ -51,14 +51,14 @@ let
       pluginRepository = canonicalPlugin.repository;
     }
   );
-  # The builder of the purifier contract (nix/lib/build-sbt-project.nix).
-  buildSbtProject = callPackage ../nix/lib/build-sbt-project.nix {
+  # The builder of the purifier contract (pkgs/build-sbt-project/default.nix).
+  buildSbtProject = callPackage ./build-sbt-project {
     inherit implementation;
     inherit (lib) purifier;
     inherit (lib.sbt-purifier) readLock;
   };
-  # The plugin's published artifacts, in Maven layout (nix/lib/plugin.nix).
-  plugin = callPackage ../nix/lib/plugin.nix { };
+  # The plugin's published artifacts, in Maven layout (pkgs/plugin/default.nix).
+  plugin = callPackage ./plugin { };
 in
 {
   inherit buildSbtProject plugin;

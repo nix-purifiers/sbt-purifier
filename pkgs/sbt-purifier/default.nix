@@ -27,7 +27,7 @@
   implementation,
 }:
 let
-  nixLib = ../../nix/lib;
+  nixLib = ../../lib-overlays/default;
 in
 writeShellScriptBin "sbt-purifier" ''
   set -euo pipefail

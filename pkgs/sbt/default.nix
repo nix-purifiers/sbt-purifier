@@ -37,7 +37,7 @@ let
   '';
   inject = writeText "sbt-nix-backend-plugin.sbt" injectText;
   legacyInject = writeText "sbt-purifier-legacy-plugin.sbt" (
-    injectText + builtins.readFile ../../nix/lib/legacy-global-settings.sbt
+    injectText + builtins.readFile ./legacy-global-settings.sbt
   );
   legacyLauncher = pkgs.fetchurl {
     url = "https://scala.jfrog.io/artifactory/api/download/ivy-releases/org.scala-sbt/sbt-launch/0.13.18/jars/sbt-launch.jar";
@@ -78,7 +78,7 @@ writeTextFile {
         ;;
     esac
     if [ "$implementation_pinned" = 1 ]; then
-      ${pkgs.python3}/bin/python ${../../nix/lib/implementation-mode.py} \
+      ${pkgs.python3}/bin/python ${./implementation-mode.py} \
         --sbt-home ${pkgs.sbt}/share/sbt -- "$@"
       # sbt 2 defaults to an existing daemon, whose plugin and environment
       # cannot be replaced by changing a client process. Keep the ordinary
@@ -154,10 +154,10 @@ writeTextFile {
       # A lockfile of another format (made by another plugin version) is
       # one nixLock replaces; until then, sbt boots the usual way.
       format=$(sed -n 's/^  "version": \([0-9]*\),$/\1/p' "$lockfile")
-      if [ -n "$locked" ] && [ "$locked" = "$wanted" ] && [ "$format" = "${toString (import ../../nix/lib/lock-version.nix)}" ]; then
+      if [ -n "$locked" ] && [ "$locked" = "$wanted" ] && [ "$format" = "${toString (import ../../lib-overlays/default/lock-version.nix)}" ]; then
         mkdir -p target/sbt-nix-backend/gcroots
         if tree=$(nix-build --expr \
-          '{ lockFile }: (import ${pkgs.path} { }).callPackage ${../../nix/lib}/dependencies.nix { inherit lockFile; }' \
+          '{ lockFile }: (import ${pkgs.path} { }).callPackage ${../plugin/nix}/dependencies.nix { inherit lockFile; }' \
           --arg lockFile "$(realpath "$lockfile")" --out-link target/sbt-nix-backend/gcroots/boot-cache); then
           export SBT_NIX_BACKEND_USER_COURSIER_CACHE="''${COURSIER_CACHE:-}"
           export COURSIER_CACHE="$tree"
@@ -202,11 +202,11 @@ writeTextFile {
         locked_launcher=$(sed -n 's/^  "launcher": "\(.*\)",$/\1/p' "$lockfile")
         launcher="$COURSIER_CACHE/$locked_launcher"
         cat > "$dir/launcher-repositories" <<EOF
-    ${import ../../nix/lib/legacy-boot-repositories.nix { base = "file://$COURSIER_CACHE"; }}
+    ${import ../build-sbt-project/legacy-boot-repositories.nix { base = "file://$COURSIER_CACHE"; }}
     EOF
       else
         cat > "$dir/launcher-repositories" <<EOF
-    ${import ../../nix/lib/legacy-boot-repositories.nix { }}
+    ${import ../build-sbt-project/legacy-boot-repositories.nix { }}
     EOF
       fi
       export SBT_OPTS="$SBT_OPTS -Dsbt.repository.config=$dir/launcher-repositories"

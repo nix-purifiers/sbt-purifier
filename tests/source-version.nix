@@ -1,9 +1,9 @@
 { pkgs }:
 let
   root = ../.;
-  expected = (import ../nix/lib/source-version.nix root).version;
+  expected = (import ../pkgs/plugin/nix/source-version.nix root).version;
   # Isolate the version bridge from lock validation and artifact compilation.
-  plugin = pkgs.callPackage ../nix/lib/plugin.nix {
+  plugin = pkgs.callPackage ../pkgs/plugin/default.nix {
     buildSbtProject = _: {
       packages.root = pkgs.runCommand "version-bridge-proof" { } "touch $out";
     };

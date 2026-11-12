@@ -3,7 +3,7 @@ package sbtnixbackend
 import java.io.File
 import java.nio.file.Files
 
-/** The sbt-nix-backend Nix library (nix/lib in its repository), which the
+/** The sbt-nix-backend resource tree, assembled from its source owners, which the
   * plugin carries in its jar: the same files whose builder the flake overlay
   * adds to a package set as `buildSbtProject`, from the same revision.
   * Interactive mode evaluates realize.nix from it, and nixPackagedArtifacts
@@ -11,28 +11,15 @@ import java.nio.file.Files
   */
 object NixLibrary {
 
-  val files: Vector[String] =
-    Vector(
-      "build-sbt-project.nix",
-      "definition-hash.nix",
-      "dependencies.nix",
-      "fetch.nix",
-      // The flake.lock of the repository, whose purifier node
-      // purifier-source.nix reads.
-      "flake.lock",
-      "legacy-boot-repositories.nix",
-      "legacy-global-settings.sbt",
-      "library.nix",
-      "lock-version.nix",
-      "package.nix",
-      "plugin.nix",
-      "project-repository.nix",
-      "purifier-source.nix",
-      "read-lock.nix",
-      "realize.nix",
-      "source-readable.nix",
-      "source-version.nix"
-    )
+  lazy val sources: Vector[(String, String)] = {
+    val text = new String(resource("resources.tsv"), java.nio.charset.StandardCharsets.UTF_8)
+    text.split("\n").iterator.filter(_.nonEmpty).map { line =>
+      val columns = line.split("\t", 2)
+      (columns(0), columns(1))
+    }.toVector
+  }
+
+  lazy val files: Vector[String] = sources.map(_._1)
 
   private[sbtnixbackend] def resource(name: String): Array[Byte] = {
     val in = getClass.getResourceAsStream("/sbtnixbackend/nix/" + name)
@@ -53,6 +40,7 @@ object NixLibrary {
     dir.mkdirs()
     files.foreach { n =>
       val f = new File(dir, n)
+      f.getParentFile.mkdirs()
       val content = resource(n)
       if (!(f.isFile && java.util.Arrays.equals(Files.readAllBytes(f.toPath), content)))
         Files.write(f.toPath, content)

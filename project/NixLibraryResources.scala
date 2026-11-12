@@ -2,20 +2,17 @@
 import sbt._
 import sbt.Keys._
 
-/** Puts the Nix library (nix/lib in this repository)
-  * into the plugin jar at sbtnixbackend/nix/, where NixLibrary reads them,
-  * so the one copy of the library is nix/lib. project/build.sbt does the
-  * same for the meta-build, which compiles the plugin from source.
-  */
+/** Copies the source-owned runtime tree exactly, using the same manifest as the meta-build. */
 object NixLibraryResources {
   def settings: Seq[Setting[_]] = Seq(
     Compile / resourceGenerators += Def.task {
       val out = (Compile / resourceManaged).value / "sbtnixbackend" / "nix"
       val root = (ThisBuild / baseDirectory).value
       // The flake.lock goes beside the library, for purifier-source.nix.
-      ((root / "nix" / "lib" * ("*.nix" | "*.sbt")).get :+ (root / "flake.lock")).map { source =>
-        val target = out / source.getName
-        IO.copyFile(source, target)
+      IO.readLines(root / "pkgs" / "plugin" / "resources.tsv").map { line =>
+        val columns = line.split("\t", 2)
+        val target = out / columns(0)
+        IO.copyFile(root / columns(1), target)
         target
       }
     }.taskValue
