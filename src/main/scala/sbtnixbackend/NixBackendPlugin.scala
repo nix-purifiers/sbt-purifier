@@ -1098,6 +1098,22 @@ object NixBackendPlugin extends AutoPlugin {
     }
   }
 
+  /** MiMa resolves previous releases through its dependency resolver rather
+    * than a fullClasspath task. Its declared getter downloads those releases
+    * without compiling the current project or running binary analysis.
+    */
+  private def captureMimaPreviousClassfiles(extracted: Extracted, state0: State): State = {
+    val previous = TaskKey[Map[sbt.librarymanagement.ModuleID, File]]("mimaPreviousClassfiles")
+    val tasks = extracted.structure.settings.flatMap { setting =>
+      val scoped = setting.key
+      if (scoped.key == previous.key) Some(Scoped.scopedTask(scoped.scope, previous.key)) else None
+    }.distinct.sortBy(_.scopedKey.toString)
+    tasks.foldLeft(state0) { (state, task) =>
+      state.log.info(s"[sbt-nix-backend] resolving previous classfiles ${task.scopedKey}")
+      extracted.runTask(task, state)._1
+    }
+  }
+
   private def scalafmtConfigs(extracted: Extracted): Vector[(AutoPlugin, TaskKey[File])] = {
     val axes = (Zero +: extracted.structure.settings.flatMap { setting =>
       setting.key.scope.task match {
@@ -1166,7 +1182,8 @@ object NixBackendPlugin extends AutoPlugin {
   private def sandboxBuild(state0: State, extracted: Extracted, flags: Seq[String], ids: Seq[String]): State = {
     val structure = extracted.structure
     var state = if (Mode.current == Mode.Lock)
-      captureToolClasspaths(extracted, captureScalafmtSessions(extracted, state0)) else state0
+      captureToolClasspaths(extracted, captureMimaPreviousClassfiles(extracted,
+        captureScalafmtSessions(extracted, state0))) else state0
     def run[T](key: TaskKey[T]): T = {
       val (s, v) = extracted.runTask(key, state)
       state = s
