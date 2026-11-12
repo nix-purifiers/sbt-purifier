@@ -53,7 +53,12 @@ export XDG_CACHE_HOME
 trap 'rm -rf "$XDG_CACHE_HOME"' EXIT
 
 for fixture in multi sbt013 sbt2 ivy matrix matrix2; do
-  (cd "$root/tests/fixtures/$fixture" && "$sbt_wrapper/bin/sbt" --server -batch "$task")
+  if [[ $fixture == sbt013 ]]; then
+    legacy_java_home=${SBT_PURIFIER_TEST_LEGACY_JAVA_HOME:-$(nix develop "$root#legacy-tests" --command printenv JAVA_HOME)}
+    (cd "$root/tests/fixtures/$fixture" && "$sbt_wrapper/bin/sbt" --server --java-home "$legacy_java_home" -batch "$task")
+  else
+    (cd "$root/tests/fixtures/$fixture" && "$sbt_wrapper/bin/sbt" --server -batch "$task")
+  fi
 done
 
 # metameta installs the plugin in its own project/project/plugins.sbt and

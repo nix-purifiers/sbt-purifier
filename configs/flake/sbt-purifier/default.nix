@@ -40,11 +40,19 @@
     { config, pkgs, ... }:
     {
       packages.default = config.packages.sbt-purifier;
-      devShells.default = pkgs.mkShell {
-        packages = [ pkgs.sbt ];
-        JAVA_HOME = pkgs.jdk.home;
-        SBT_NIX_BACKEND_REPOSITORY = config.packages.plugin-repository;
-        SBT_NIX_BACKEND_PLUGIN_VERSION = config.packages.plugin.version;
+      devShells = {
+        default = pkgs.mkShell {
+          packages = [ pkgs.sbt ];
+          JAVA_HOME = pkgs.jdk.home;
+          SBT_NIX_BACKEND_REPOSITORY = config.packages.plugin-repository;
+          SBT_NIX_BACKEND_PLUGIN_VERSION = config.packages.plugin.version;
+        };
+      }
+      // lib.optionalAttrs pkgs.stdenv.isLinux {
+        # Explicit fixture profile: sbt 0.13 and Scala 2.10 need an older JVM.
+        legacy-tests = pkgs.mkShell {
+          JAVA_HOME = pkgs.jdk8_headless.home;
+        };
       };
     };
 

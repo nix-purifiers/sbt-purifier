@@ -135,9 +135,11 @@ def compose(args, evidence):
         java_version = re.search(r'COMPOSITION_JAVA_VERSION\|([^\r\n]+)', plain_native).group(1).strip()
         java_major = java_version.split('.')[1] if java_version.startswith('1.') else java_version.split('.')[0]
         assert java_major == locked['javaVersion'], 'actual project JVM differs from lock'
-        assert java_home.startswith('/nix/store/'), 'native JVM must have an immutable SDK identity'
-        evidence.receipt['nativeJvm'] = {'home': java_home, 'version': java_version, 'role': 'native-project-runtime'}
-        evidence.selected('native-project-jdk', '/'.join(java_home.split('/')[:4]))
+        java_binary = (Path(java_home) / 'bin/java').resolve(strict=True)
+        evidence.receipt['nativeJvm'] = {'home': java_home, 'version': java_version,
+            'role': 'native-project-runtime', 'binary': str(java_binary), 'binarySha256': sha256(java_binary)}
+        if java_home.startswith('/nix/store/'):
+            evidence.selected('native-project-jdk', '/'.join(java_home.split('/')[:4]))
         native_dependencies = observed_origins(plain_native,
             {'org.apache.commons.text.WordUtils', 'org.apache.commons.lang3.StringUtils'})
         provider_jar = Path(provider) / 'org/apache/commons/commons-lang3/0.0.1/commons-lang3-0.0.1.jar'
