@@ -16,7 +16,6 @@ let
   parts = [
     "build.sbt"
     "flake.lock"
-    "version.txt"
     "project"
     "src"
     "nix"
@@ -34,4 +33,9 @@ in
       name = baseNameOf path;
     in
     builtins.elem top parts && !(type == "directory" && name == "target");
-}).packages.root
+}).packages.root.overrideAttrs (finalAttrs: previousAttrs: {
+  version = (import ./source-version.nix root).version;
+  # A publisher can override `version` explicitly. The sbt build must publish
+  # that exact value, rather than recomputing a development version inside it.
+  SBT_NIX_BACKEND_RELEASE_VERSION = finalAttrs.version;
+})

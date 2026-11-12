@@ -35,7 +35,7 @@ let
       implementation.wrap candidate
     else
       throw "sbt-purifier: this scope changes the source-owned wrapper recipe; use the source exported packages for implementation pins";
-  pluginVersion = builtins.replaceStrings [ "\n" ] [ "" ] (builtins.readFile ../version.txt);
+  pluginVersion = (import ../nix/lib/source-version.nix ../.).version;
   canonicalBuilder = canonicalPkgs.callPackage ../nix/lib/build-sbt-project.nix {
     inherit implementation;
     inherit (implementationLib) purifier;

@@ -2,13 +2,12 @@
 
 ThisBuild / organization := "io.github.clhodapp"
 ThisBuild / organizationName := "io.github.clhodapp"
-// A release build names its version in SBT_NIX_BACKEND_RELEASE_VERSION
-// (.github/release/build.sh); every other build has the version in
-// version.txt, which the Nix packaging of the plugin reads too.
+// Releases pass their version explicitly; source builds identify the plugin
+// source bytes, using the same manifest as the Nix wrapper's injected version.
 ThisBuild / version := sys.env
   .get("SBT_NIX_BACKEND_RELEASE_VERSION")
   .filter(_.nonEmpty)
-  .getOrElse(IO.read((ThisBuild / baseDirectory).value / "version.txt").trim)
+  .getOrElse(SourceVersion.version((ThisBuild / baseDirectory).value))
 ThisBuild / licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
 ThisBuild / homepage := Some(url("https://nix-purifiers.github.io/sbt-purifier/"))
 

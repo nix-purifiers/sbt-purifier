@@ -172,13 +172,16 @@ resolvers += MavenRepository(
 )
 addSbtPlugin(
   "io.github.clhodapp" % "sbt-nix-backend" %
-    backendRepository.fold("0.1.4")(_ => "0.1.0")
+    backendRepository.fold("0.1.4") { _ =>
+      sys.env.getOrElse("SBT_NIX_BACKEND_PLUGIN_VERSION", sys.error("missing supplied plugin version"))
+    }
 )
 ```
 
 `nix shell 'github:nix-purifiers/sbt-purifier#sbt'` provides the sbt
 wrapper, which sets `SBT_NIX_BACKEND_REPOSITORY` to the plugin repository
-when it launches sbt. The example uses its source-built version, `0.1.0`, when that variable is set and the
+when it launches sbt, and supplies the matching version in
+`SBT_NIX_BACKEND_PLUGIN_VERSION`. The example uses that source-built version and the
 published version, `0.1.4`, from GitHub Pages otherwise. In a
 meta-build, the plugin adds itself to the build the meta-build defines,
 so `project/` and the build both have it.
@@ -527,5 +530,17 @@ The purifier idea was inspired by nixcloud's
 Dependency resolution uses [Coursier](https://get-coursier.io).
 
 ## Development
+
+Source builds use `0.0.0-dev.<sha256>` from the plugin's `build.sbt`,
+`project/`, `src/`, `nix/`, `flake.lock` and `sbt-purifier.lock.json` bytes.
+Nix and native sbt hash the same sorted file manifest, excluding generated
+`target/` directories. The self-build lock omits publication versions, so
+it can identify the resolved dependencies without recording this version
+inside its own fingerprint. This version does not depend on Git tags or
+the checkout path.
+
+Release builders pass the version explicitly: overriding the Nix plugin
+package's `version` also supplies that version to sbt. Ordinary native sbt
+accepts `SBT_NIX_BACKEND_RELEASE_VERSION` for the same explicit release use.
 
 `docs/development/` describes the project, its tests and its commands.

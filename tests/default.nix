@@ -824,6 +824,7 @@ in
     done
     touch $out
   '';
+  source-version = import ./source-version.nix { inherit pkgs; };
   composition-producer = import ./composition-producer.nix {
     inherit pkgs;
     purifier = flakeLib.purifier;

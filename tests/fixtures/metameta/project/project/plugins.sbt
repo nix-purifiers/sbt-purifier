@@ -13,4 +13,7 @@ resolvers += MavenRepository(
   backendRepository.map(path => new File(path).toURI.toString)
     .getOrElse("https://nix-purifiers.github.io/sbt-purifier/maven")
 )
-addSbtPlugin("io.github.clhodapp" % "sbt-nix-backend" % backendRepository.fold("0.1.4")(_ => "0.1.0"))
+val backendVersion = backendRepository.fold("0.1.4") { _ =>
+  sys.env.getOrElse("SBT_NIX_BACKEND_PLUGIN_VERSION", sys.error("missing supplied plugin version"))
+}
+addSbtPlugin("io.github.clhodapp" % "sbt-nix-backend" % backendVersion)
