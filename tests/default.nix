@@ -832,6 +832,12 @@ in
 
 }
 // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+  local-java-runtime = import ./local-java.nix {
+    inherit pkgs;
+    wrapper = withOverlay.sbt-purifier.sbt;
+    dependencies = multi.dependencies;
+    fixture = ./fixtures/multi;
+  };
   ivy-native-state = import ./ivy-state.nix {
     inherit pkgs;
     sdk = multi;
