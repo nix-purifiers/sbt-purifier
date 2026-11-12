@@ -48,7 +48,7 @@
           SBT_NIX_BACKEND_PLUGIN_VERSION = config.packages.plugin.version;
         };
       }
-      // lib.optionalAttrs pkgs.stdenv.isLinux {
+      // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
         # Explicit fixture profile: sbt 0.13 and Scala 2.10 need an older JVM.
         legacy-tests = pkgs.mkShell {
           JAVA_HOME = pkgs.jdk8_headless.home;
