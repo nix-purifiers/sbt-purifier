@@ -114,6 +114,7 @@ def compose(args, evidence):
                 ['nix', 'develop', producer_reference + '#legacy-tests', '--command', 'printenv', 'JAVA_HOME'],
                 text=True).strip()
             env.update(JAVA_HOME=legacy_home, JAVACMD=str(Path(legacy_home) / 'bin/java'))
+            env['PATH'] = str(Path(legacy_home) / 'bin') + os.pathsep + env.get('PATH', '')
             evidence.receipt['testJvmProfile'] = {'name': 'legacy-tests', 'home': legacy_home}
         def run(*commands):
             output = evidence.output([str(sbt), '-batch', ';' + ';'.join(commands)], cwd=project, env=env, text=True)
