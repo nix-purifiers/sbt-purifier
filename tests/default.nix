@@ -78,6 +78,27 @@ let
     doCheck = true;
   };
 
+  # Java 8's default source/Javadoc encoding follows the process locale.
+  # The ordinary lock capture uses UTF-8; a C-locale sandbox must not turn
+  # non-ASCII documentation into an unmappable-character failure.
+  unicodeJavadoc = buildSbtProject {
+    src = pkgs.runCommand "sbt-unicode-javadoc-source" { } ''
+      cp -r ${./fixtures/multi} $out
+      chmod -R u+w $out
+      cat > $out/javalib/src/main/java/example/javalib/Shout.java <<'EOF'
+      package example.javalib;
+      import org.apache.commons.text.WordUtils;
+      /** Describes a café. */
+      public final class Shout {
+          private Shout() {}
+          public static String shout(String s) { return WordUtils.capitalizeFully(s); }
+      }
+      EOF
+    '';
+    lockFile = ./fixtures/multi/sbt-purifier.lock.json;
+    jdk = pkgs.jdk8_headless;
+  };
+
   # sbt 0.13's implicit project id must survive copying into a sandbox.
   legacy = buildSbtProject {
     src = ./fixtures/sbt013;
@@ -421,6 +442,19 @@ in
 
   # Feature 1: the coursier cache of the multi fixture.
   multi-dependencies = multi.dependencies;
+
+  jdk8-unicode-javadoc =
+    pkgs.runCommand "sbt-jdk8-unicode-javadoc"
+      {
+        nativeBuildInputs = [ pkgs.unzip ];
+      }
+      ''
+        jar=$(find ${unicodeJavadoc.packages.javalib} -name '*-javadoc.jar' -print -quit)
+        test -n "$jar"
+        unzip -p "$jar" example/javalib/Shout.html > $TMPDIR/Shout.html
+        grep -F 'café' $TMPDIR/Shout.html
+        touch $out
+      '';
 
   # Feature 2: each package holds its own artifacts.
   multi-app-artifacts = onlyOwnArtifacts "multi-app-artifacts" multi.packages.app "example/app_3" { };

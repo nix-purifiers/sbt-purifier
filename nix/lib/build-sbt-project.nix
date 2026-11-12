@@ -228,6 +228,12 @@ let
   # The sbt invocation shared by every package build; nixLock runs sbt the
   # same way, so a lock made from it holds what this needs.
   runSbt = command: ''
+    # Java 8 follows the locale for source and Javadoc encoding. The Nix
+    # sandbox's default C locale is ASCII, unlike ordinary UTF-8 capture.
+    # Include forked Java tools through the locale rather than forcing a
+    # JVM property over a project's explicitly configured encoding.
+    export LANG=${if stdenvNoCC.hostPlatform.isDarwin then "en_US.UTF-8" else "C.UTF-8"}
+    export LC_ALL="$LANG"
     export HOME="$TMPDIR/home"
     export XDG_RUNTIME_DIR="$TMPDIR/run"
     export XDG_CACHE_HOME="$HOME/.cache" XDG_CONFIG_HOME="$HOME/.config"
