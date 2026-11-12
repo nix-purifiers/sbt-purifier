@@ -1076,9 +1076,30 @@ object NixBackendPlugin extends AutoPlugin {
       else sandboxBuild(state0, extracted, flags, ids)
     }
 
+  /** Plugins can resolve an executable tool through a task-scoped classpath,
+    * outside a project's compile/test dependencies. Scala.js's linker is one
+    * example. Resolve those declared classpaths during capture, without running
+    * the tool or its tests, so their native downloads enter the same cache.
+    */
+  private def captureToolClasspaths(extracted: Extracted, state0: State): State = {
+    val tasks = extracted.structure.settings.flatMap { setting =>
+      val scoped = setting.key
+      val scope = scoped.scope
+      val toolScope = scope.task match {
+        case Select(_) => true
+        case _         => false
+      }
+      if (scoped.key == fullClasspath.key && toolScope) Some(Scoped.scopedTask(scope, fullClasspath.key)) else None
+    }.distinct.sortBy(_.scopedKey.toString)
+    tasks.foldLeft(state0) { (state, task) =>
+      state.log.info(s"[sbt-nix-backend] resolving tool classpath ${task.scopedKey}")
+      extracted.runTask(task, state)._1
+    }
+  }
+
   private def sandboxBuild(state0: State, extracted: Extracted, flags: Seq[String], ids: Seq[String]): State = {
     val structure = extracted.structure
-    var state = state0
+    var state = if (Mode.current == Mode.Lock) captureToolClasspaths(extracted, state0) else state0
     def run[T](key: TaskKey[T]): T = {
       val (s, v) = extracted.runTask(key, state)
       state = s

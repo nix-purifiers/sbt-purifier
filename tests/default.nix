@@ -442,6 +442,14 @@ in
   independent-sample-offline-tasks = independent.offline;
   sbt2-tests = sbt2.tests;
 
+  # Capture task-scoped tool dependencies used by an isolated runtime loader.
+  tool-classpath-runtime =
+    (buildSbtProject {
+      src = ./fixtures/tool-classpath;
+      pluginRepository = plugin-repository;
+      doCheck = true;
+    }).tests;
+
   nix-library = import ./nix-library.nix { inherit pkgs overlay flakeLib; };
 
   # Feature 1: the coursier cache of the multi fixture.
