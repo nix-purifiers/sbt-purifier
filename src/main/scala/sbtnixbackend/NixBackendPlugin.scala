@@ -445,7 +445,7 @@ object NixBackendPlugin extends AutoPlugin {
         .flatMap(_.catalog)
         .flatMap(ProjectedDependencies.readCatalog)
     ),
-    nixSbtJavaOptions := Seq("-Xss4m", "-Xmx2g"),
+    nixSbtJavaOptions := JvmOptions.captureDefaults,
     nixLauncherUrl := {
       val v = sbtVersion.value
       BootRepositories.launcher(v)
