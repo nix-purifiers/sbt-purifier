@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "contentHash": "744d585fbd1742914c3a57d3f43c4f5a4304b793d30002b948fbd7b78ac4bd11",
+  "contentHash": "efcccffee3f3234899e22a194548b0287405ef0c76ed327dde4a8e439558281a",
   "sbtVersion": "1.13.1",
   "javaVersion": "21",
   "launcher": "https/repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.13.1/sbt-launch-1.13.1.jar",
@@ -11,7 +11,7 @@
   "plugin": {
     "organization": "io.github.clhodapp",
     "name": "sbt-nix-backend",
-    "version": "0.1.0",
+    "version": "0.0.0-dev.a98cb4da47a9293b80ad13132fc80e01981c7be1caceef641bdd20fe356ee73d",
     "via": "global-plugin"
   },
   "projects": [
@@ -74,7 +74,7 @@
     }
   ],
   "flakeRepositories": [],
-  "inputsHash": "294c9f476cd13af1f14c685cba7cc6d8457b2b6463ef07f9f76d15668bb5debc",
+  "inputsHash": "47c2d828f967c8a93de20efdb52e5819f713c93f4d97579c5d7009f38644e226",
   "definitionHash": "70e855bf36912d2fba266f9c8d19c0ff07287515b186b6c006152f8343b7bb75",
   "artifacts": [
     {
@@ -894,6 +894,86 @@
       "hash": "sha256-HPiv9wdrSsrJ2Tj3CSj0zau7s1m+9IJycB0j5P76oqU="
     },
     {
+      "path": "https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.5.1/fansi_2.12-0.5.1.jar",
+      "url": "https://repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.5.1/fansi_2.12-0.5.1.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/lihaoyi/fansi_2.12/0.5.1/fansi_2.12-0.5.1.jar"
+      ],
+      "hash": "sha256-V70oX/TEqnBvvibgjjRIgbD8BaGn74koOF+rm1II3oE="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.5.1/fansi_2.12-0.5.1.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.5.1/fansi_2.12-0.5.1.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/lihaoyi/fansi_2.12/0.5.1/fansi_2.12-0.5.1.jar.sha1"
+      ],
+      "hash": "sha256-TlDIp82yOg3PV5Pwmd9nGyV7bewXKSFBHjGMfEKIWUY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.5.1/fansi_2.12-0.5.1.pom",
+      "url": "https://repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.5.1/fansi_2.12-0.5.1.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/lihaoyi/fansi_2.12/0.5.1/fansi_2.12-0.5.1.pom"
+      ],
+      "hash": "sha256-tTpKe3e7K6IfAaMZsjEAuc3ONkci2vYI8mJN2k2Z/Bc="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.5.1/fansi_2.12-0.5.1.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.5.1/fansi_2.12-0.5.1.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/lihaoyi/fansi_2.12/0.5.1/fansi_2.12-0.5.1.pom.sha1"
+      ],
+      "hash": "sha256-9QJB+FHek8sYuapHffs/exqsmyuXh70AA8Zq1wLoiWY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.4.0/sourcecode_2.12-0.4.0.pom",
+      "url": "https://repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.4.0/sourcecode_2.12-0.4.0.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/lihaoyi/sourcecode_2.12/0.4.0/sourcecode_2.12-0.4.0.pom"
+      ],
+      "hash": "sha256-+24hkFCI9OH2nbj4wNG9x3FLxv2m3DVte5vygKmIKYM="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.4.0/sourcecode_2.12-0.4.0.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.4.0/sourcecode_2.12-0.4.0.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/lihaoyi/sourcecode_2.12/0.4.0/sourcecode_2.12-0.4.0.pom.sha1"
+      ],
+      "hash": "sha256-AVSOSj0hJcdVxk/fwNYB0no7RhDgKsya3U9caFElqOo="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.4.4/sourcecode_2.12-0.4.4.jar",
+      "url": "https://repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.4.4/sourcecode_2.12-0.4.4.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/lihaoyi/sourcecode_2.12/0.4.4/sourcecode_2.12-0.4.4.jar"
+      ],
+      "hash": "sha256-s75eT3PcpN/I0gNhmNV5IWOScxiDEli9++mnhplKKtE="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.4.4/sourcecode_2.12-0.4.4.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.4.4/sourcecode_2.12-0.4.4.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/lihaoyi/sourcecode_2.12/0.4.4/sourcecode_2.12-0.4.4.jar.sha1"
+      ],
+      "hash": "sha256-Nezhoji0m0XHsfycuwcMDHTvBNhh+wAqOabEalUm1ks="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.4.4/sourcecode_2.12-0.4.4.pom",
+      "url": "https://repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.4.4/sourcecode_2.12-0.4.4.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/lihaoyi/sourcecode_2.12/0.4.4/sourcecode_2.12-0.4.4.pom"
+      ],
+      "hash": "sha256-vlPBsXb8Kg+/PPzjwdEcZ4JzYa5lI3cfX7rnPz7MUwI="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.4.4/sourcecode_2.12-0.4.4.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.4.4/sourcecode_2.12-0.4.4.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/lihaoyi/sourcecode_2.12/0.4.4/sourcecode_2.12-0.4.4.pom.sha1"
+      ],
+      "hash": "sha256-58wWTEZsJ2GbcxUvPWbm0M2WDplscFqpDa4FDJgIzOE="
+    },
+    {
       "path": "https/repo1.maven.org/maven2/com/lmax/disruptor/3.4.2/disruptor-3.4.2-sources.jar",
       "url": "https://repo1.maven.org/maven2/com/lmax/disruptor/3.4.2/disruptor-3.4.2-sources.jar",
       "mirrors": [
@@ -1036,6 +1116,38 @@
         "https://maven-central.storage-download.googleapis.com/maven2/com/typesafe/config/1.4.5/config-1.4.5.pom.sha1"
       ],
       "hash": "sha256-WZCXoTDi7mUK0T/XXS/hVK1kp4QGbhW4P5DjwX4M2eI="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/typesafe/config/1.4.9/config-1.4.9.jar",
+      "url": "https://repo1.maven.org/maven2/com/typesafe/config/1.4.9/config-1.4.9.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/typesafe/config/1.4.9/config-1.4.9.jar"
+      ],
+      "hash": "sha256-R9E+MZbITyqMzQFK5WNzjD2lt0BrOOA1BewGAaL0/Dc="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/typesafe/config/1.4.9/config-1.4.9.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/com/typesafe/config/1.4.9/config-1.4.9.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/typesafe/config/1.4.9/config-1.4.9.jar.sha1"
+      ],
+      "hash": "sha256-j8+IVdoUd7CUn55CRmZSAp7F26+jiUoWvf3DigQvtVI="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/typesafe/config/1.4.9/config-1.4.9.pom",
+      "url": "https://repo1.maven.org/maven2/com/typesafe/config/1.4.9/config-1.4.9.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/typesafe/config/1.4.9/config-1.4.9.pom"
+      ],
+      "hash": "sha256-wZ+wNb9uVFZRtWfHL+sBCMxOVxAHkUc6BJipaJRoEm4="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/typesafe/config/1.4.9/config-1.4.9.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/com/typesafe/config/1.4.9/config-1.4.9.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/typesafe/config/1.4.9/config-1.4.9.pom.sha1"
+      ],
+      "hash": "sha256-Ktmd7Zm6lIs/FKWn9is5L7DbggjFs6yPFjkQsx1BHoI="
     },
     {
       "path": "https/repo1.maven.org/maven2/com/typesafe/ssl-config-core_2.12/0.7.1/ssl-config-core_2.12-0.7.1-sources.jar",
@@ -3822,6 +3934,38 @@
       "hash": "sha256-zE8f0xRkaGzNvM4/oFCq2JtjLVHU76I6e+Gktg4T+OQ="
     },
     {
+      "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.20/scala-compiler-2.12.20.jar",
+      "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.20/scala-compiler-2.12.20.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scala-lang/scala-compiler/2.12.20/scala-compiler-2.12.20.jar"
+      ],
+      "hash": "sha256-yIZ211xpchtxfqbEQezgT/8mKrq50hCik2q8K+NzH6I="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.20/scala-compiler-2.12.20.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.20/scala-compiler-2.12.20.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scala-lang/scala-compiler/2.12.20/scala-compiler-2.12.20.jar.sha1"
+      ],
+      "hash": "sha256-ZO5prt439LZF6kMsM0f5TYxIivk/tRZgIbreiedJfUk="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.20/scala-compiler-2.12.20.pom",
+      "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.20/scala-compiler-2.12.20.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scala-lang/scala-compiler/2.12.20/scala-compiler-2.12.20.pom"
+      ],
+      "hash": "sha256-0EuDcRBCOxRZc/mmUWq2r9nAnFBUO4x8Y6xskK1MyqM="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.20/scala-compiler-2.12.20.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.20/scala-compiler-2.12.20.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scala-lang/scala-compiler/2.12.20/scala-compiler-2.12.20.pom.sha1"
+      ],
+      "hash": "sha256-ZzlYMeNSini+1J+c/CYTrEPrZjI37k5sMJdxh226164="
+    },
+    {
       "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.21/scala-compiler-2.12.21-sources.jar",
       "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.21/scala-compiler-2.12.21-sources.jar",
       "mirrors": [
@@ -3934,6 +4078,38 @@
       "hash": "sha256-aUcUADsxbujbloX5XsZ7JAq2bCyC7fAuOROy5q9DJ+s="
     },
     {
+      "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.20/scala-library-2.12.20.jar",
+      "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.20/scala-library-2.12.20.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scala-lang/scala-library/2.12.20/scala-library-2.12.20.jar"
+      ],
+      "hash": "sha256-TYqPmEzOMaMpok8QsL8zbwQstirrQ1KQobICQxVM/Ms="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.20/scala-library-2.12.20.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.20/scala-library-2.12.20.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scala-lang/scala-library/2.12.20/scala-library-2.12.20.jar.sha1"
+      ],
+      "hash": "sha256-TEofuQz0YlddSIj2zfQF7gU4dnuq+NrAb2YLniXJPUw="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.20/scala-library-2.12.20.pom",
+      "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.20/scala-library-2.12.20.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scala-lang/scala-library/2.12.20/scala-library-2.12.20.pom"
+      ],
+      "hash": "sha256-lMMVtMUaTI0KM/F34WDdrWO2hZX+s5l/oleRxaFKA8k="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.20/scala-library-2.12.20.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.20/scala-library-2.12.20.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scala-lang/scala-library/2.12.20/scala-library-2.12.20.pom.sha1"
+      ],
+      "hash": "sha256-d0B1qjwJE9X/OFfjUKNL0ry4hLVN/GOMgEcAfV+ytV4="
+    },
+    {
       "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.21/scala-library-2.12.21-sources.jar",
       "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.21/scala-library-2.12.21-sources.jar",
       "mirrors": [
@@ -4044,6 +4220,38 @@
         "https://maven-central.storage-download.googleapis.com/maven2/org/scala-lang/scala-library/2.13.18/scala-library-2.13.18.pom.sha1"
       ],
       "hash": "sha256-9tl635HsBiTNLTGoVspJeysIf4ZzaBAbpD8BrGg4QyQ="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.20/scala-reflect-2.12.20.jar",
+      "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.20/scala-reflect-2.12.20.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scala-lang/scala-reflect/2.12.20/scala-reflect-2.12.20.jar"
+      ],
+      "hash": "sha256-XxkUzcenBYDqYDjZKeuyVzbs8iNPZ34tR/iksryB4fs="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.20/scala-reflect-2.12.20.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.20/scala-reflect-2.12.20.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scala-lang/scala-reflect/2.12.20/scala-reflect-2.12.20.jar.sha1"
+      ],
+      "hash": "sha256-dWAuHf7hkO6z4ROqHwIb3aygSxhT7PNN+ChU3vsOXa0="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.20/scala-reflect-2.12.20.pom",
+      "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.20/scala-reflect-2.12.20.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scala-lang/scala-reflect/2.12.20/scala-reflect-2.12.20.pom"
+      ],
+      "hash": "sha256-YVHES17En36VVUUNas5H6ZQSm1ERGc82QEXhiGSvjpY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.20/scala-reflect-2.12.20.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.20/scala-reflect-2.12.20.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scala-lang/scala-reflect/2.12.20/scala-reflect-2.12.20.pom.sha1"
+      ],
+      "hash": "sha256-osW5qIOgqK5qN/DanKfL5XTycPo9Gn3mijEej/xUk4o="
     },
     {
       "path": "https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.21/scala-reflect-2.12.21-sources.jar",
@@ -6366,6 +6574,486 @@
       "hash": "sha256-NnCXw6aYOn+YIM95MbddYfYaq+pDz1kIAAxmHbRMdO8="
     },
     {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/common2_2.12/4.17.3/common2_2.12-4.17.3.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/common2_2.12/4.17.3/common2_2.12-4.17.3.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/common2_2.12/4.17.3/common2_2.12-4.17.3.jar"
+      ],
+      "hash": "sha256-r6OFN7h61Vxfm+EKqX4hCRPt4E3E85l4gMw/sutXSuo="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/common2_2.12/4.17.3/common2_2.12-4.17.3.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/common2_2.12/4.17.3/common2_2.12-4.17.3.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/common2_2.12/4.17.3/common2_2.12-4.17.3.jar.sha1"
+      ],
+      "hash": "sha256-8lW5L4abAqWKORJmDV0vIoWEJpk4iRpNvv0yseGy9uE="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/common2_2.12/4.17.3/common2_2.12-4.17.3.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/common2_2.12/4.17.3/common2_2.12-4.17.3.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/common2_2.12/4.17.3/common2_2.12-4.17.3.pom"
+      ],
+      "hash": "sha256-gnabxPe5FeRhEGpJcZvThM9rzo5mX9qDjabbk/MQ3K0="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/common2_2.12/4.17.3/common2_2.12-4.17.3.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/common2_2.12/4.17.3/common2_2.12-4.17.3.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/common2_2.12/4.17.3/common2_2.12-4.17.3.pom.sha1"
+      ],
+      "hash": "sha256-PLrEqPXiWrOdCDb9GpRYkShLLOgLCcNZNA1VOey/6Kk="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/common_2.12/4.14.0/common_2.12-4.14.0.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/common_2.12/4.14.0/common_2.12-4.14.0.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/common_2.12/4.14.0/common_2.12-4.14.0.jar"
+      ],
+      "hash": "sha256-7/JrtWEApMEFw/p/R1+EXCa3vgVomOsOl56gZoLxVT4="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/common_2.12/4.14.0/common_2.12-4.14.0.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/common_2.12/4.14.0/common_2.12-4.14.0.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/common_2.12/4.14.0/common_2.12-4.14.0.jar.sha1"
+      ],
+      "hash": "sha256-uiJOi58yTKfykt4tejL9/MlVLF1cPbcsM/JHHb+qZy8="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/common_2.12/4.14.0/common_2.12-4.14.0.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/common_2.12/4.14.0/common_2.12-4.14.0.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/common_2.12/4.14.0/common_2.12-4.14.0.pom"
+      ],
+      "hash": "sha256-CtOvDwk4KKFLemGV0xMKTbJKyd4FOBR4M/Zsj42Slbo="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/common_2.12/4.14.0/common_2.12-4.14.0.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/common_2.12/4.14.0/common_2.12-4.14.0.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/common_2.12/4.14.0/common_2.12-4.14.0.pom.sha1"
+      ],
+      "hash": "sha256-l7BdsfM5QozX3BORnMp1H2lSJSAGIATm4Fgf9CU6jxY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/common_2.12/4.17.3/common_2.12-4.17.3.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/common_2.12/4.17.3/common_2.12-4.17.3.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/common_2.12/4.17.3/common_2.12-4.17.3.jar"
+      ],
+      "hash": "sha256-svD3yH2vlCWt0p2cPfYXX7F/EnkcgZD6jYV+PdMdzxI="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/common_2.12/4.17.3/common_2.12-4.17.3.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/common_2.12/4.17.3/common_2.12-4.17.3.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/common_2.12/4.17.3/common_2.12-4.17.3.jar.sha1"
+      ],
+      "hash": "sha256-Ct/5a0ewgusQYIwORgYcSaVqddi5cOo1gjgfm2VvUng="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/common_2.12/4.17.3/common_2.12-4.17.3.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/common_2.12/4.17.3/common_2.12-4.17.3.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/common_2.12/4.17.3/common_2.12-4.17.3.pom"
+      ],
+      "hash": "sha256-PNlUmlQt11KM2Oa7zYoQKSh+DIE0YenXhnyOYYJnyTo="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/common_2.12/4.17.3/common_2.12-4.17.3.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/common_2.12/4.17.3/common_2.12-4.17.3.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/common_2.12/4.17.3/common_2.12-4.17.3.pom.sha1"
+      ],
+      "hash": "sha256-ZKIUEO7vpP+b2mkRfyOo2PqrdYLHwF6n84RWRJzWSv4="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/io_2.12/4.14.0/io_2.12-4.14.0.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/io_2.12/4.14.0/io_2.12-4.14.0.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/io_2.12/4.14.0/io_2.12-4.14.0.jar"
+      ],
+      "hash": "sha256-WfTfjmUz/J2VRtMwDu+6IJrzuWc/ULi5oBh6ag89q3I="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/io_2.12/4.14.0/io_2.12-4.14.0.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/io_2.12/4.14.0/io_2.12-4.14.0.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/io_2.12/4.14.0/io_2.12-4.14.0.jar.sha1"
+      ],
+      "hash": "sha256-/Uf2ACJYA6rP3rLz3jBpX/0DiBO5cNrpSN15w+YiRlU="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/io_2.12/4.14.0/io_2.12-4.14.0.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/io_2.12/4.14.0/io_2.12-4.14.0.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/io_2.12/4.14.0/io_2.12-4.14.0.pom"
+      ],
+      "hash": "sha256-Zl1Zt/45Lg+PRXlYCl+bAAgP0llGafIHf4lLkmm/62E="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/io_2.12/4.14.0/io_2.12-4.14.0.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/io_2.12/4.14.0/io_2.12-4.14.0.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/io_2.12/4.14.0/io_2.12-4.14.0.pom.sha1"
+      ],
+      "hash": "sha256-DTbt8WEZ6LYSU2jCRIaPmjeH+lJijfdosios4HG3VAk="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/io_2.12/4.17.3/io_2.12-4.17.3.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/io_2.12/4.17.3/io_2.12-4.17.3.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/io_2.12/4.17.3/io_2.12-4.17.3.jar"
+      ],
+      "hash": "sha256-jzHPVHEkkG5ER53pi3mFXHjwQAR64WMsl1YecCvlvMI="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/io_2.12/4.17.3/io_2.12-4.17.3.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/io_2.12/4.17.3/io_2.12-4.17.3.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/io_2.12/4.17.3/io_2.12-4.17.3.jar.sha1"
+      ],
+      "hash": "sha256-DsOUdX9ZXtnv4lXfOWg9EUA5G5j7nujGnbtW+iIJnfY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/io_2.12/4.17.3/io_2.12-4.17.3.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/io_2.12/4.17.3/io_2.12-4.17.3.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/io_2.12/4.17.3/io_2.12-4.17.3.pom"
+      ],
+      "hash": "sha256-DNmw4ksB9+4MJZRiieAHBVxxAYSEdrDcVeWD6PQkq5g="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/io_2.12/4.17.3/io_2.12-4.17.3.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/io_2.12/4.17.3/io_2.12-4.17.3.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/io_2.12/4.17.3/io_2.12-4.17.3.pom.sha1"
+      ],
+      "hash": "sha256-iomMXh6WFHrF3+JKP7xxs+pq/aCDrOMqWZovSTdnDpE="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.8.0/mdoc-parser_2.12-2.8.0.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.8.0/mdoc-parser_2.12-2.8.0.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/mdoc-parser_2.12/2.8.0/mdoc-parser_2.12-2.8.0.jar"
+      ],
+      "hash": "sha256-VTHxbFDl3cnky+HhqvecUqmmShw12nCr9iowp/rdyeo="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.8.0/mdoc-parser_2.12-2.8.0.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.8.0/mdoc-parser_2.12-2.8.0.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/mdoc-parser_2.12/2.8.0/mdoc-parser_2.12-2.8.0.jar.sha1"
+      ],
+      "hash": "sha256-cs1Asbm8xhjXzsso4+z5tyyzVrM5tICXlIdIeKVHUgY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.8.0/mdoc-parser_2.12-2.8.0.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.8.0/mdoc-parser_2.12-2.8.0.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/mdoc-parser_2.12/2.8.0/mdoc-parser_2.12-2.8.0.pom"
+      ],
+      "hash": "sha256-p05LoJiIiqoezKCGhPL9jz4nZ3NC0FfAGxUs5L6wULw="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.8.0/mdoc-parser_2.12-2.8.0.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.8.0/mdoc-parser_2.12-2.8.0.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/mdoc-parser_2.12/2.8.0/mdoc-parser_2.12-2.8.0.pom.sha1"
+      ],
+      "hash": "sha256-MlSuq0wVD7m1bV8kW3Y6tNoaLD5TIoU0tZTLHZAMBNs="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.9.1/mdoc-parser_2.12-2.9.1.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.9.1/mdoc-parser_2.12-2.9.1.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/mdoc-parser_2.12/2.9.1/mdoc-parser_2.12-2.9.1.jar"
+      ],
+      "hash": "sha256-DrjRYSJZ64hImEcO3UUfd4jr+Y1UvhcAVUp9hBT/CuY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.9.1/mdoc-parser_2.12-2.9.1.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.9.1/mdoc-parser_2.12-2.9.1.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/mdoc-parser_2.12/2.9.1/mdoc-parser_2.12-2.9.1.jar.sha1"
+      ],
+      "hash": "sha256-EISmlkDkXr4moodZ7fxnx7HPk9dHvsqZ76sw1w3dk8c="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.9.1/mdoc-parser_2.12-2.9.1.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.9.1/mdoc-parser_2.12-2.9.1.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/mdoc-parser_2.12/2.9.1/mdoc-parser_2.12-2.9.1.pom"
+      ],
+      "hash": "sha256-uuRiwj4vfBy83Ev+ORMM3JNK3X4qqb9ZrtNpQvwVLQc="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.9.1/mdoc-parser_2.12-2.9.1.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/mdoc-parser_2.12/2.9.1/mdoc-parser_2.12-2.9.1.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/mdoc-parser_2.12/2.9.1/mdoc-parser_2.12-2.9.1.pom.sha1"
+      ],
+      "hash": "sha256-IcoCSkC4VH5IsSswF/XxgJh7RIW3YeNWpP75Fl0UlWk="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.17.0/metaconfig-core_2.12-0.17.0.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.17.0/metaconfig-core_2.12-0.17.0.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-core_2.12/0.17.0/metaconfig-core_2.12-0.17.0.jar"
+      ],
+      "hash": "sha256-X5sU2ooroj0xVWw7atmKwdDqzNiAUEq5F4tuXuq1th4="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.17.0/metaconfig-core_2.12-0.17.0.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.17.0/metaconfig-core_2.12-0.17.0.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-core_2.12/0.17.0/metaconfig-core_2.12-0.17.0.jar.sha1"
+      ],
+      "hash": "sha256-FkW884q09gZL2FCwXd0sr26AhF5yzdnKeLbt31J3U0Y="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.17.0/metaconfig-core_2.12-0.17.0.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.17.0/metaconfig-core_2.12-0.17.0.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-core_2.12/0.17.0/metaconfig-core_2.12-0.17.0.pom"
+      ],
+      "hash": "sha256-K/PBEl4q7wK+nOH6a4d3bSrFVng2NIwDWIKLf11EDdU="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.17.0/metaconfig-core_2.12-0.17.0.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.17.0/metaconfig-core_2.12-0.17.0.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-core_2.12/0.17.0/metaconfig-core_2.12-0.17.0.pom.sha1"
+      ],
+      "hash": "sha256-+/pWw2f3STIk3y91qLrmPs0Ud6FKajOsvg1BS4CW0Ek="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.18.7/metaconfig-core_2.12-0.18.7.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.18.7/metaconfig-core_2.12-0.18.7.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-core_2.12/0.18.7/metaconfig-core_2.12-0.18.7.jar"
+      ],
+      "hash": "sha256-yC97Dp5Nko2uq75z3tDn2QEuZXwzMzOLf8hf34U3Qvg="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.18.7/metaconfig-core_2.12-0.18.7.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.18.7/metaconfig-core_2.12-0.18.7.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-core_2.12/0.18.7/metaconfig-core_2.12-0.18.7.jar.sha1"
+      ],
+      "hash": "sha256-ymAvdr5P2lUq2ljD9MtCBY7kKDHDBflMZCdOcA9mk84="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.18.7/metaconfig-core_2.12-0.18.7.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.18.7/metaconfig-core_2.12-0.18.7.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-core_2.12/0.18.7/metaconfig-core_2.12-0.18.7.pom"
+      ],
+      "hash": "sha256-BPB8aDr/DyOOGyPNNjHNwTfBjHgeXSTZMMpcrqswYp0="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.18.7/metaconfig-core_2.12-0.18.7.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-core_2.12/0.18.7/metaconfig-core_2.12-0.18.7.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-core_2.12/0.18.7/metaconfig-core_2.12-0.18.7.pom.sha1"
+      ],
+      "hash": "sha256-DDpvfEYsTNAMH1Fs9ZdHgZyOfIWFRuXDGa4P6fTAuyc="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.17.0/metaconfig-pprint_2.12-0.17.0.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.17.0/metaconfig-pprint_2.12-0.17.0.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-pprint_2.12/0.17.0/metaconfig-pprint_2.12-0.17.0.jar"
+      ],
+      "hash": "sha256-aTFUnZEbyWE1ly8sD5ad3xdXNPifUo2+xUWhr1hTZ+Q="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.17.0/metaconfig-pprint_2.12-0.17.0.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.17.0/metaconfig-pprint_2.12-0.17.0.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-pprint_2.12/0.17.0/metaconfig-pprint_2.12-0.17.0.jar.sha1"
+      ],
+      "hash": "sha256-vGOCfFxqTCjnVEmtqTKtHERhPcD9r0V6mEYsVe0N5ko="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.17.0/metaconfig-pprint_2.12-0.17.0.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.17.0/metaconfig-pprint_2.12-0.17.0.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-pprint_2.12/0.17.0/metaconfig-pprint_2.12-0.17.0.pom"
+      ],
+      "hash": "sha256-L3fzO5Ub2L3KNMsUZe9D3n73arOX4ckF0rK7m/q7oOk="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.17.0/metaconfig-pprint_2.12-0.17.0.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.17.0/metaconfig-pprint_2.12-0.17.0.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-pprint_2.12/0.17.0/metaconfig-pprint_2.12-0.17.0.pom.sha1"
+      ],
+      "hash": "sha256-8MHr6keXWWM1R06F1/oWBbYprxRzV/epa6NLjvlERJQ="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.18.7/metaconfig-pprint_2.12-0.18.7.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.18.7/metaconfig-pprint_2.12-0.18.7.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-pprint_2.12/0.18.7/metaconfig-pprint_2.12-0.18.7.jar"
+      ],
+      "hash": "sha256-CUk2Fu2lowciDlGCBCrWkMzXPtIGx8RQ3ZV38ItGR+E="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.18.7/metaconfig-pprint_2.12-0.18.7.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.18.7/metaconfig-pprint_2.12-0.18.7.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-pprint_2.12/0.18.7/metaconfig-pprint_2.12-0.18.7.jar.sha1"
+      ],
+      "hash": "sha256-tzKHfjqQoODkCpdSbQgulNwC/UeqEQ+bji1jHXtfa1Y="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.18.7/metaconfig-pprint_2.12-0.18.7.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.18.7/metaconfig-pprint_2.12-0.18.7.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-pprint_2.12/0.18.7/metaconfig-pprint_2.12-0.18.7.pom"
+      ],
+      "hash": "sha256-y51/M/Db6hJ/Dxt8rtiLhoJj38qvhBtRxNyiUkseflY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.18.7/metaconfig-pprint_2.12-0.18.7.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-pprint_2.12/0.18.7/metaconfig-pprint_2.12-0.18.7.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-pprint_2.12/0.18.7/metaconfig-pprint_2.12-0.18.7.pom.sha1"
+      ],
+      "hash": "sha256-fkvLVBk3ikJkvcNCbGIHAFIw1mtIJk8tXs7nzKSbhUY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.17.0/metaconfig-typesafe-config_2.12-0.17.0.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.17.0/metaconfig-typesafe-config_2.12-0.17.0.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.17.0/metaconfig-typesafe-config_2.12-0.17.0.jar"
+      ],
+      "hash": "sha256-gtkKyIC9h5vN8QuXnWFBBN7mAmjOQaH891lWgorYqd4="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.17.0/metaconfig-typesafe-config_2.12-0.17.0.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.17.0/metaconfig-typesafe-config_2.12-0.17.0.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.17.0/metaconfig-typesafe-config_2.12-0.17.0.jar.sha1"
+      ],
+      "hash": "sha256-WMyolv6Ss7qyiI6DUiKe17vmayhZLGdM3C1Wc4tF3Mc="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.17.0/metaconfig-typesafe-config_2.12-0.17.0.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.17.0/metaconfig-typesafe-config_2.12-0.17.0.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.17.0/metaconfig-typesafe-config_2.12-0.17.0.pom"
+      ],
+      "hash": "sha256-u+UmPy6zhN8tpraCEMcgKVpyae47UJYTJIgY/dpPwCE="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.17.0/metaconfig-typesafe-config_2.12-0.17.0.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.17.0/metaconfig-typesafe-config_2.12-0.17.0.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.17.0/metaconfig-typesafe-config_2.12-0.17.0.pom.sha1"
+      ],
+      "hash": "sha256-sWpWDX+gatrR9FG/deXkH1ZCoQ6PQ3VP6cZGBb2cz4I="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.18.7/metaconfig-typesafe-config_2.12-0.18.7.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.18.7/metaconfig-typesafe-config_2.12-0.18.7.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.18.7/metaconfig-typesafe-config_2.12-0.18.7.jar"
+      ],
+      "hash": "sha256-kvANxIxwNTT4GSaV3zRaxStOVyn7mBeLILWAcTahhsM="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.18.7/metaconfig-typesafe-config_2.12-0.18.7.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.18.7/metaconfig-typesafe-config_2.12-0.18.7.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.18.7/metaconfig-typesafe-config_2.12-0.18.7.jar.sha1"
+      ],
+      "hash": "sha256-orQyfQaVO/p1bKS4rgf8qGyLC5VOzUaek9GVzZQAqdk="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.18.7/metaconfig-typesafe-config_2.12-0.18.7.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.18.7/metaconfig-typesafe-config_2.12-0.18.7.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.18.7/metaconfig-typesafe-config_2.12-0.18.7.pom"
+      ],
+      "hash": "sha256-SLbdFPS8ao2OVdB3U6G3TP64FdfSS8uUtl3owFkzOUc="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.18.7/metaconfig-typesafe-config_2.12-0.18.7.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.18.7/metaconfig-typesafe-config_2.12-0.18.7.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/metaconfig-typesafe-config_2.12/0.18.7/metaconfig-typesafe-config_2.12-0.18.7.pom.sha1"
+      ],
+      "hash": "sha256-nCffOFIVvQ7nRsaEoOy0iQCnWw0I+QMR+amMJaGggcM="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.14.0/parsers_2.12-4.14.0.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.14.0/parsers_2.12-4.14.0.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/parsers_2.12/4.14.0/parsers_2.12-4.14.0.jar"
+      ],
+      "hash": "sha256-GyGWjkFpmTt9miQT6ZZa03J0yk3/tIN+ZOXB0TbMCOQ="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.14.0/parsers_2.12-4.14.0.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.14.0/parsers_2.12-4.14.0.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/parsers_2.12/4.14.0/parsers_2.12-4.14.0.jar.sha1"
+      ],
+      "hash": "sha256-1EI/yLRqVJZqmjLWGI0jdk8wh4UAxGc4KlVsaeRoJN4="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.14.0/parsers_2.12-4.14.0.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.14.0/parsers_2.12-4.14.0.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/parsers_2.12/4.14.0/parsers_2.12-4.14.0.pom"
+      ],
+      "hash": "sha256-IUgfyaRT6zXnz5xTsQtKK/LFFhwSUsJjzcJ1MfiO9rY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.14.0/parsers_2.12-4.14.0.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.14.0/parsers_2.12-4.14.0.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/parsers_2.12/4.14.0/parsers_2.12-4.14.0.pom.sha1"
+      ],
+      "hash": "sha256-5Yg6SE7O0GqeHzojJBKZ1JZDjaU+uJ7QWZHbD6Rh4jI="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.17.3/parsers_2.12-4.17.3.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.17.3/parsers_2.12-4.17.3.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/parsers_2.12/4.17.3/parsers_2.12-4.17.3.jar"
+      ],
+      "hash": "sha256-aySAZMzLLyLWMNp2qv/9U/bdNanSCn9fHPL5txWGHQ8="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.17.3/parsers_2.12-4.17.3.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.17.3/parsers_2.12-4.17.3.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/parsers_2.12/4.17.3/parsers_2.12-4.17.3.jar.sha1"
+      ],
+      "hash": "sha256-mq9B9UZPDcWdmgc2ebeL9oXwGsINgICo4s5zSJvJgs4="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.17.3/parsers_2.12-4.17.3.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.17.3/parsers_2.12-4.17.3.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/parsers_2.12/4.17.3/parsers_2.12-4.17.3.pom"
+      ],
+      "hash": "sha256-n3CtpziZJTPjefiy0nVkxlLd2dslzCYV1XCE8Wso1eI="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.17.3/parsers_2.12-4.17.3.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.17.3/parsers_2.12-4.17.3.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/parsers_2.12/4.17.3/parsers_2.12-4.17.3.pom.sha1"
+      ],
+      "hash": "sha256-gpirYTfc15yZV50SCOqu3NlNOnbxR6TqnMFqH36m9eY="
+    },
+    {
       "path": "https/repo1.maven.org/maven2/org/scalameta/sbt-scalafmt_2.12_1.0/2.5.6/sbt-scalafmt_2.12_1.0-2.5.6-sources.jar",
       "url": "https://repo1.maven.org/maven2/org/scalameta/sbt-scalafmt_2.12_1.0/2.5.6/sbt-scalafmt_2.12_1.0-2.5.6-sources.jar",
       "mirrors": [
@@ -6412,6 +7100,134 @@
         "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/sbt-scalafmt_2.12_1.0/2.5.6/sbt-scalafmt_2.12_1.0-2.5.6.pom.sha1"
       ],
       "hash": "sha256-iwl/Jsm5DS8R9s4EV+7Z1ay7EfHuC8hVXJXnO3a+bOY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.10.0/scalafmt-config_2.12-3.10.0.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.10.0/scalafmt-config_2.12-3.10.0.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-config_2.12/3.10.0/scalafmt-config_2.12-3.10.0.jar"
+      ],
+      "hash": "sha256-uO9rwClAv5dqfgF8knNOn0kVI9jXzh3p1DJEA5dJLUs="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.10.0/scalafmt-config_2.12-3.10.0.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.10.0/scalafmt-config_2.12-3.10.0.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-config_2.12/3.10.0/scalafmt-config_2.12-3.10.0.jar.sha1"
+      ],
+      "hash": "sha256-O5vVNRqc+ahDDINKSGEfm1Mklarw7w55Qby+Uz72fNo="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.10.0/scalafmt-config_2.12-3.10.0.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.10.0/scalafmt-config_2.12-3.10.0.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-config_2.12/3.10.0/scalafmt-config_2.12-3.10.0.pom"
+      ],
+      "hash": "sha256-GUTlBBJpWhqu7sOwJV2m6VFyKmTEohg+5XoUFGgYcDg="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.10.0/scalafmt-config_2.12-3.10.0.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.10.0/scalafmt-config_2.12-3.10.0.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-config_2.12/3.10.0/scalafmt-config_2.12-3.10.0.pom.sha1"
+      ],
+      "hash": "sha256-CPp2YummsO2hgR0aKoNlJlDHDqVfgijoWbuOfLtIkBg="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.11.5/scalafmt-config_2.12-3.11.5.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.11.5/scalafmt-config_2.12-3.11.5.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-config_2.12/3.11.5/scalafmt-config_2.12-3.11.5.jar"
+      ],
+      "hash": "sha256-7EYBtDmC3pPSPIEv1XAmXMvBRYp9IoOwXtxDMMJpQ6I="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.11.5/scalafmt-config_2.12-3.11.5.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.11.5/scalafmt-config_2.12-3.11.5.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-config_2.12/3.11.5/scalafmt-config_2.12-3.11.5.jar.sha1"
+      ],
+      "hash": "sha256-qRABlfOc0iNPrpzQJOw+8wA8L0v3m4oG8LKykpVU6SU="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.11.5/scalafmt-config_2.12-3.11.5.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.11.5/scalafmt-config_2.12-3.11.5.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-config_2.12/3.11.5/scalafmt-config_2.12-3.11.5.pom"
+      ],
+      "hash": "sha256-RZ+2OEYsUFuEHDKb9N6PVtaEjetErBl4SnCV4dwVV5Y="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.11.5/scalafmt-config_2.12-3.11.5.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-config_2.12/3.11.5/scalafmt-config_2.12-3.11.5.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-config_2.12/3.11.5/scalafmt-config_2.12-3.11.5.pom.sha1"
+      ],
+      "hash": "sha256-OsW/gVr6TsHnuBKKchOvzgtPlsts/6EQkRRnQ7xIE20="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.10.0/scalafmt-core_2.12-3.10.0.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.10.0/scalafmt-core_2.12-3.10.0.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-core_2.12/3.10.0/scalafmt-core_2.12-3.10.0.jar"
+      ],
+      "hash": "sha256-hMcX3duHXuJzdXtX3vU1gd47JKRFuqmf0QtgE5DWfY4="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.10.0/scalafmt-core_2.12-3.10.0.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.10.0/scalafmt-core_2.12-3.10.0.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-core_2.12/3.10.0/scalafmt-core_2.12-3.10.0.jar.sha1"
+      ],
+      "hash": "sha256-LfnulLmiwKvxMtIjXyUBn/PaZGlKXidjOhSpBOTvOcw="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.10.0/scalafmt-core_2.12-3.10.0.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.10.0/scalafmt-core_2.12-3.10.0.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-core_2.12/3.10.0/scalafmt-core_2.12-3.10.0.pom"
+      ],
+      "hash": "sha256-+M/K9AhZHPm3Jai0Owx6sCSY4hvoWFcnXI8VEYNWtD8="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.10.0/scalafmt-core_2.12-3.10.0.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.10.0/scalafmt-core_2.12-3.10.0.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-core_2.12/3.10.0/scalafmt-core_2.12-3.10.0.pom.sha1"
+      ],
+      "hash": "sha256-NELHXe2PiaU10Nw2WPHoQf6uVYqiwGwqUa2vbbENpt4="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.11.5/scalafmt-core_2.12-3.11.5.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.11.5/scalafmt-core_2.12-3.11.5.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-core_2.12/3.11.5/scalafmt-core_2.12-3.11.5.jar"
+      ],
+      "hash": "sha256-7GpEfTw6aYIdkeRK6VXSNy2Hx3zRL47TQK4oKWrfqPI="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.11.5/scalafmt-core_2.12-3.11.5.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.11.5/scalafmt-core_2.12-3.11.5.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-core_2.12/3.11.5/scalafmt-core_2.12-3.11.5.jar.sha1"
+      ],
+      "hash": "sha256-YEMfkXiP13idZUl9ECGYowWf3TNgPTu7ZxOgUgCrxOQ="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.11.5/scalafmt-core_2.12-3.11.5.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.11.5/scalafmt-core_2.12-3.11.5.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-core_2.12/3.11.5/scalafmt-core_2.12-3.11.5.pom"
+      ],
+      "hash": "sha256-E69SdmEcJrqq+9zqGg0WODAUXw+CnmO+VoTgArZCXKM="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.11.5/scalafmt-core_2.12-3.11.5.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/3.11.5/scalafmt-core_2.12-3.11.5.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-core_2.12/3.11.5/scalafmt-core_2.12-3.11.5.pom.sha1"
+      ],
+      "hash": "sha256-eN6iKewyk7hSlxLLvoWr2j2nkSGEk9EzSNAR6UJJ4SI="
     },
     {
       "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-dynamic_2.12/3.10.0/scalafmt-dynamic_2.12-3.10.0-sources.jar",
@@ -6510,6 +7326,70 @@
       "hash": "sha256-aKyyab0T+Vyf9+8PVFxkUAWK/2oJciYtN8E8Lhikhrw="
     },
     {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.10.0/scalafmt-macros_2.12-3.10.0.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.10.0/scalafmt-macros_2.12-3.10.0.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-macros_2.12/3.10.0/scalafmt-macros_2.12-3.10.0.jar"
+      ],
+      "hash": "sha256-lQhnk+Tk2/ACRvEFUzjWy1vfBdUFKaqrzkDlS7KPKVY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.10.0/scalafmt-macros_2.12-3.10.0.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.10.0/scalafmt-macros_2.12-3.10.0.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-macros_2.12/3.10.0/scalafmt-macros_2.12-3.10.0.jar.sha1"
+      ],
+      "hash": "sha256-PUsdDeJ17A7jrSpDCDf7Gywuci/99wIBRFnlQyJSnXM="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.10.0/scalafmt-macros_2.12-3.10.0.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.10.0/scalafmt-macros_2.12-3.10.0.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-macros_2.12/3.10.0/scalafmt-macros_2.12-3.10.0.pom"
+      ],
+      "hash": "sha256-DhDY9qpgufbhlHk25M8OtHvyKnUyV7J9Ggs98Y9jnLs="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.10.0/scalafmt-macros_2.12-3.10.0.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.10.0/scalafmt-macros_2.12-3.10.0.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-macros_2.12/3.10.0/scalafmt-macros_2.12-3.10.0.pom.sha1"
+      ],
+      "hash": "sha256-8rmQwSI5fGLIsigCV8sP0TobfTs5gqECfQwWOuKVRTk="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.11.5/scalafmt-macros_2.12-3.11.5.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.11.5/scalafmt-macros_2.12-3.11.5.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-macros_2.12/3.11.5/scalafmt-macros_2.12-3.11.5.jar"
+      ],
+      "hash": "sha256-XBPVkoknTabDDEBBWms+H8GJxFVLrcLyPom0bYg6z6I="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.11.5/scalafmt-macros_2.12-3.11.5.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.11.5/scalafmt-macros_2.12-3.11.5.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-macros_2.12/3.11.5/scalafmt-macros_2.12-3.11.5.jar.sha1"
+      ],
+      "hash": "sha256-20rcE1W2GIzX2xRa4BBuuzl+zIPtW+yniF6ByvGuCGM="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.11.5/scalafmt-macros_2.12-3.11.5.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.11.5/scalafmt-macros_2.12-3.11.5.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-macros_2.12/3.11.5/scalafmt-macros_2.12-3.11.5.pom"
+      ],
+      "hash": "sha256-hhhiHqO1KcVi62AkL69XOVrKOCAPE6L9hl///T2OATY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.11.5/scalafmt-macros_2.12-3.11.5.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-macros_2.12/3.11.5/scalafmt-macros_2.12-3.11.5.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-macros_2.12/3.11.5/scalafmt-macros_2.12-3.11.5.pom.sha1"
+      ],
+      "hash": "sha256-KRoYGIDVZAnV5Jfv0A6DV3VZUzz2BI/HIwGHVXnYlmY="
+    },
+    {
       "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-sysops_2.12/3.10.0/scalafmt-sysops_2.12-3.10.0-sources.jar",
       "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-sysops_2.12/3.10.0/scalafmt-sysops_2.12-3.10.0-sources.jar",
       "mirrors": [
@@ -6556,6 +7436,198 @@
         "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-sysops_2.12/3.10.0/scalafmt-sysops_2.12-3.10.0.pom.sha1"
       ],
       "hash": "sha256-oNdezlVTGjIxe5EAExpKPZPSZp3iH8cs2MvLkxf7vgg="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-sysops_2.12/3.11.5/scalafmt-sysops_2.12-3.11.5.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-sysops_2.12/3.11.5/scalafmt-sysops_2.12-3.11.5.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-sysops_2.12/3.11.5/scalafmt-sysops_2.12-3.11.5.jar"
+      ],
+      "hash": "sha256-PRRzNenlV2qNJ2IPW/vUSnNs0uxx4opKmtwg45N0XMs="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-sysops_2.12/3.11.5/scalafmt-sysops_2.12-3.11.5.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-sysops_2.12/3.11.5/scalafmt-sysops_2.12-3.11.5.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-sysops_2.12/3.11.5/scalafmt-sysops_2.12-3.11.5.jar.sha1"
+      ],
+      "hash": "sha256-VszefUeQX6G+kROQ5AkspScdYHvjchsBvBzVyM20/VA="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-sysops_2.12/3.11.5/scalafmt-sysops_2.12-3.11.5.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-sysops_2.12/3.11.5/scalafmt-sysops_2.12-3.11.5.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-sysops_2.12/3.11.5/scalafmt-sysops_2.12-3.11.5.pom"
+      ],
+      "hash": "sha256-HUOZ/vh747KmAHXYxrHsY879mIQijJNOnpKMHAeWGsI="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalafmt-sysops_2.12/3.11.5/scalafmt-sysops_2.12-3.11.5.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalafmt-sysops_2.12/3.11.5/scalafmt-sysops_2.12-3.11.5.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalafmt-sysops_2.12/3.11.5/scalafmt-sysops_2.12-3.11.5.pom.sha1"
+      ],
+      "hash": "sha256-vbqi2g89r/BqIit8GwgFpfXi5rfS7/3hYZEyb88EJQc="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.14.0/scalameta_2.12-4.14.0.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.14.0/scalameta_2.12-4.14.0.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalameta_2.12/4.14.0/scalameta_2.12-4.14.0.jar"
+      ],
+      "hash": "sha256-V7D4qqnr3DXsffOAgq8joFPRH/4KAAGAtCfDIhirjNY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.14.0/scalameta_2.12-4.14.0.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.14.0/scalameta_2.12-4.14.0.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalameta_2.12/4.14.0/scalameta_2.12-4.14.0.jar.sha1"
+      ],
+      "hash": "sha256-yl1Kr3bInK/8oap3YA3HHwQkyYBxKNu0MfFVzAKWSh0="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.14.0/scalameta_2.12-4.14.0.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.14.0/scalameta_2.12-4.14.0.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalameta_2.12/4.14.0/scalameta_2.12-4.14.0.pom"
+      ],
+      "hash": "sha256-aJV1Sia0lxhBOlR1OMALdfD69SbDT2qSDp1fRcKY3yo="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.14.0/scalameta_2.12-4.14.0.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.14.0/scalameta_2.12-4.14.0.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalameta_2.12/4.14.0/scalameta_2.12-4.14.0.pom.sha1"
+      ],
+      "hash": "sha256-UuVaKXBqXUIf8du3vloW3kvpQOuzHmUrFzFCueP1lVY="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.17.3/scalameta_2.12-4.17.3.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.17.3/scalameta_2.12-4.17.3.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalameta_2.12/4.17.3/scalameta_2.12-4.17.3.jar"
+      ],
+      "hash": "sha256-/i8rVVoBPtkSyw+vXb/q44wud9iPvEBJtWZGyiEYMak="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.17.3/scalameta_2.12-4.17.3.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.17.3/scalameta_2.12-4.17.3.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalameta_2.12/4.17.3/scalameta_2.12-4.17.3.jar.sha1"
+      ],
+      "hash": "sha256-z4m9v0AAMpR2aov8lDlixuE4HsFmglrESHLgLM1dzwk="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.17.3/scalameta_2.12-4.17.3.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.17.3/scalameta_2.12-4.17.3.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalameta_2.12/4.17.3/scalameta_2.12-4.17.3.pom"
+      ],
+      "hash": "sha256-jlcGhlm7/x6zDFz2d+2OsrAr2hxUUwJbwbcZujxbLe8="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.17.3/scalameta_2.12-4.17.3.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.17.3/scalameta_2.12-4.17.3.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/scalameta_2.12/4.17.3/scalameta_2.12-4.17.3.pom.sha1"
+      ],
+      "hash": "sha256-JE4VWk30VDvtSShsSvozpK++Lod+4HllOmgduRYMza0="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/trees2_2.12/4.17.3/trees2_2.12-4.17.3.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/trees2_2.12/4.17.3/trees2_2.12-4.17.3.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/trees2_2.12/4.17.3/trees2_2.12-4.17.3.jar"
+      ],
+      "hash": "sha256-Q1tUltg16NdvmytePn8tW+abCNJxC0XAIFPbqOms2CM="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/trees2_2.12/4.17.3/trees2_2.12-4.17.3.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/trees2_2.12/4.17.3/trees2_2.12-4.17.3.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/trees2_2.12/4.17.3/trees2_2.12-4.17.3.jar.sha1"
+      ],
+      "hash": "sha256-7koPF5ZusRoubykFpIo59dWqAO+Eal1mEO/8Gxaoj/Y="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/trees2_2.12/4.17.3/trees2_2.12-4.17.3.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/trees2_2.12/4.17.3/trees2_2.12-4.17.3.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/trees2_2.12/4.17.3/trees2_2.12-4.17.3.pom"
+      ],
+      "hash": "sha256-uhABMHjm7MWrcPNYJ6/zphVkbPgmfpknb9mwfuSiqUA="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/trees2_2.12/4.17.3/trees2_2.12-4.17.3.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/trees2_2.12/4.17.3/trees2_2.12-4.17.3.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/trees2_2.12/4.17.3/trees2_2.12-4.17.3.pom.sha1"
+      ],
+      "hash": "sha256-IYB+y05M++a/bBNLx99MTQhYXZnL2H1XdCYmuryCGwk="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/trees_2.12/4.14.0/trees_2.12-4.14.0.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/trees_2.12/4.14.0/trees_2.12-4.14.0.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/trees_2.12/4.14.0/trees_2.12-4.14.0.jar"
+      ],
+      "hash": "sha256-/81NSC3zIxG357QdXSgLAM26A3x/7CzLlTU3LttOGJw="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/trees_2.12/4.14.0/trees_2.12-4.14.0.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/trees_2.12/4.14.0/trees_2.12-4.14.0.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/trees_2.12/4.14.0/trees_2.12-4.14.0.jar.sha1"
+      ],
+      "hash": "sha256-kxUiiv7BKKl36M7P7hzN8V4XQeq0WqDHu4kxjSJjdy8="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/trees_2.12/4.14.0/trees_2.12-4.14.0.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/trees_2.12/4.14.0/trees_2.12-4.14.0.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/trees_2.12/4.14.0/trees_2.12-4.14.0.pom"
+      ],
+      "hash": "sha256-CymUV3HcchxrOT6A0+qlEY+thjeqNXYDWu/iealQt9M="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/trees_2.12/4.14.0/trees_2.12-4.14.0.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/trees_2.12/4.14.0/trees_2.12-4.14.0.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/trees_2.12/4.14.0/trees_2.12-4.14.0.pom.sha1"
+      ],
+      "hash": "sha256-0MZQVRMw2vT++8A6BqyvD7qz1YB6tIkCjywm68zyh3A="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/trees_2.12/4.17.3/trees_2.12-4.17.3.jar",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/trees_2.12/4.17.3/trees_2.12-4.17.3.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/trees_2.12/4.17.3/trees_2.12-4.17.3.jar"
+      ],
+      "hash": "sha256-HpKTwcdZxWJg06SJVncfBwZ8F9tQrgBXzXKp9EWYsIA="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/trees_2.12/4.17.3/trees_2.12-4.17.3.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/trees_2.12/4.17.3/trees_2.12-4.17.3.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/trees_2.12/4.17.3/trees_2.12-4.17.3.jar.sha1"
+      ],
+      "hash": "sha256-XpZe6riXPfzGtwtNbBuiZROIq0Fi8vAkkf23UJMLvKQ="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/trees_2.12/4.17.3/trees_2.12-4.17.3.pom",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/trees_2.12/4.17.3/trees_2.12-4.17.3.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/trees_2.12/4.17.3/trees_2.12-4.17.3.pom"
+      ],
+      "hash": "sha256-mjyu3KOUi036VH74MWKbprFILMca8NZhCCRTRT4dGms="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/scalameta/trees_2.12/4.17.3/trees_2.12-4.17.3.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scalameta/trees_2.12/4.17.3/trees_2.12-4.17.3.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scalameta/trees_2.12/4.17.3/trees_2.12-4.17.3.pom.sha1"
+      ],
+      "hash": "sha256-/M9wyOliRFDE0L4NmN7OgVvERY9tkVQdmRRlQ538fs8="
     },
     {
       "path": "https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36-sources.jar",
@@ -6716,6 +7788,38 @@
         "https://maven-central.storage-download.googleapis.com/maven2/org/tukaani/xz/1.9/xz-1.9.pom.sha1"
       ],
       "hash": "sha256-dlGhDOjwyUoqs7L9+AG54HqauXGKQrLJnxl1m4xF4HA="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/typelevel/paiges-core_2.12/0.4.4/paiges-core_2.12-0.4.4.jar",
+      "url": "https://repo1.maven.org/maven2/org/typelevel/paiges-core_2.12/0.4.4/paiges-core_2.12-0.4.4.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/typelevel/paiges-core_2.12/0.4.4/paiges-core_2.12-0.4.4.jar"
+      ],
+      "hash": "sha256-v/rPa/w0bUgissGOYvs58YQYvutB+El2H/msHCCprqk="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/typelevel/paiges-core_2.12/0.4.4/paiges-core_2.12-0.4.4.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/typelevel/paiges-core_2.12/0.4.4/paiges-core_2.12-0.4.4.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/typelevel/paiges-core_2.12/0.4.4/paiges-core_2.12-0.4.4.jar.sha1"
+      ],
+      "hash": "sha256-zMRpCYR9OjySYfZ6D1MSHTJlIMzYHs/jWZTYO4+cf14="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/typelevel/paiges-core_2.12/0.4.4/paiges-core_2.12-0.4.4.pom",
+      "url": "https://repo1.maven.org/maven2/org/typelevel/paiges-core_2.12/0.4.4/paiges-core_2.12-0.4.4.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/typelevel/paiges-core_2.12/0.4.4/paiges-core_2.12-0.4.4.pom"
+      ],
+      "hash": "sha256-c8/Cy7Wn5u6xkV25DFBVQN/0DjG+PIYo9QZ3/Gieufg="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/org/typelevel/paiges-core_2.12/0.4.4/paiges-core_2.12-0.4.4.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/org/typelevel/paiges-core_2.12/0.4.4/paiges-core_2.12-0.4.4.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/typelevel/paiges-core_2.12/0.4.4/paiges-core_2.12-0.4.4.pom.sha1"
+      ],
+      "hash": "sha256-ougPVisnWalKdSeaWC7V91vjUXPvEsxiU6Dlu5bOROg="
     },
     {
       "path": "https/repo1.maven.org/maven2/org/virtuslab/scala-cli/config_2.12/1.1.3/config_2.12-1.1.3-sources.jar",
