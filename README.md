@@ -198,7 +198,7 @@ so `project/` and the build both have it.
 | `nixFlakeModule(name)` | The module a flake repository publishes. |
 | `nixNetworkFile(url)` | Where a declared URL is in the coursier cache. |
 | `nixPackaged` | Whether the lockfile builds the project (default: `!(publish / skip)`). |
-| `nixSbtJavaOptions` | JVM options of the sbt that the lock run and Nix builds run. |
+| `nixSbtJavaOptions` | JVM options of the sbt that the lock run and Nix builds run. Defaults carry explicit startup heap, stack, code-cache, metaspace and CPU limits, with fallback `-Xss4m -Xmx2g` for unspecified resources. |
 | `nixNixpkgs` | The nixpkgs `nixPackagedArtifacts` builds with. |
 | `nixBackend` | Whether interactive resolution reads the lockfile. |
 

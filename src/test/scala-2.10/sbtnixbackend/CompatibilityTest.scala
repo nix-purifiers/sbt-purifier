@@ -5,6 +5,10 @@ import org.junit.Assert._
 import sbt._
 
 class CompatibilityTest {
+  @Test def captureMemoryOptions(): Unit = {
+    assertEquals(Vector("-Xss4m", "-Xmx8g"), JvmOptions.inheritResources(
+      Vector("-Xss4m", "-Xmx2g"), Vector("-Xmx8g", "-Dhttps.proxyPassword=secret")))
+  }
   @Test def jsonRoundTrip(): Unit = {
     val value = Json.obj("message" -> Json.str("quote\"\n"), "array" -> Json.Arr(Vector(Json.str("value"))))
     assertEquals(value, Json.parse(value.render))
