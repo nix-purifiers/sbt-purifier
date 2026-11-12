@@ -824,10 +824,11 @@ object NixBackendPlugin extends AutoPlugin {
       sys.error("sbt-nix-backend: the plugin was injected but its jar names no coordinates")
     val javaOptions = (ThisBuild / nixSbtJavaOptions).value.toVector
     val launcherUrl = (ThisBuild / nixLauncherUrl).value
+    val toolInputs = scalafmtInputs.value
     val hash = Lock.buildDefinitionHash(
       root,
       Seq("plugin=" + plugin.fold("none")(p => s"${p.organization}:${p.name}:${p.version} via ${p.via}"), "launcher=" + launcherUrl) ++
-        javaOptions.map("javaOption=" + _) ++ urls.map("url=" + _) ++
+        javaOptions.map("javaOption=" + _) ++ urls.map("url=" + _) ++ toolInputs ++
         lockedRepos.map(r => s"flake=${r.name}=${r.locked}#${r.attribute}") ++
         projects.map(p => s"project=${p.id}=${p.organization}:${p.name}") ++
         crossNames.map("published=" + _)
@@ -1097,35 +1098,65 @@ object NixBackendPlugin extends AutoPlugin {
     }
   }
 
+  private def scalafmtConfigs(extracted: Extracted): Vector[(AutoPlugin, TaskKey[File])] = {
+    val axes = (Zero +: extracted.structure.settings.flatMap { setting =>
+      setting.key.scope.task match {
+        case Select(key) if key.label.startsWith("scalafmt") => Some(setting.key.scope.task)
+        case _ => None
+      }
+    }).distinct
+    extracted.structure.allProjectRefs.toVector.flatMap { ref =>
+      val project = extracted.get(ref / thisProject)
+      project.autoPlugins.find(_.getClass.getName == "org.scalafmt.sbt.ScalafmtPlugin$").toVector.flatMap { plugin =>
+        val configs = ((ref / TaskKey[File]("scalafmtConfig")) +:
+          project.configurations.map(c => ref / c / TaskKey[File]("scalafmtConfig"))).distinct
+        configs.flatMap { config => axes.map(axis => Scoped.scopedTask(config.scope.copy(task = axis), config.key)) }
+          .distinct.filter(Compat.hasTask(extracted, _)).map(plugin -> _)
+      }
+    }
+  }
+
+  private def scalafmtInput(plugin: AutoPlugin, key: TaskKey[File], root: File): Def.Initialize[Task[Option[String]]] =
+    Def.task(Compat.uncached {
+      val config = key.value.getCanonicalFile
+      if (!config.isFile) Option.empty[String]
+      else {
+        val relative = root.toPath.relativize(config.toPath).toString.replace(File.separatorChar, '/')
+        Some("scalafmt=" + relative + "=" + ScalafmtCapture.version(plugin, config))
+      }
+    })
+
+  private def joinScalafmtInputs(tasks: Seq[Def.Initialize[Task[Option[String]]]]): Def.Initialize[Task[Vector[String]]] = {
+    val joined = tasks.join.apply(_.join)
+    Def.task(Compat.uncached { joined.value.flatten.distinct.sorted.toVector })
+  }
+
+  private def scalafmtInputs: Def.Initialize[Task[Vector[String]]] = Def.taskDyn {
+    val root = (ThisBuild / nixBuildRoot).value.getCanonicalFile
+    val configs = scalafmtConfigs(Project.extract(state.value))
+    joinScalafmtInputs(configs.map { case (plugin, key) => scalafmtInput(plugin, key, root) })
+  }
+
   private def captureScalafmtSessions(extracted: Extracted, state0: State): State = {
     var state = state0
     val seen = scala.collection.mutable.Set.empty[(ClassLoader, File, String, Seq[String], Seq[AnyRef])]
-    extracted.structure.allProjectRefs.foreach { ref =>
-      val project = extracted.get(ref / thisProject)
-      project.autoPlugins.find(_.getClass.getName == "org.scalafmt.sbt.ScalafmtPlugin$").foreach { plugin =>
-        val configs = ((ref / TaskKey[File]("scalafmtConfig")) +:
-          project.configurations.map(c => ref / c / TaskKey[File]("scalafmtConfig"))).distinct
-        configs.foreach { configTask =>
-          if (Compat.hasTask(extracted, configTask)) {
-            val (s1, configured) = extracted.runTask(configTask, state)
-            val config = configured.getCanonicalFile
-            state = s1
-            if (config.isFile) {
-              val resolverTask = Scoped.scopedTask(configTask.scope, fullResolvers.key)
-              val credentialTask = Scoped.scopedTask(configTask.scope, credentials.key)
-              val (s2, resolvers) = extracted.runTask(resolverTask, state)
-              val (s3, configuredCredentials) = extracted.runTask(credentialTask, s2)
-              state = s3
-              val repositories = resolvers.collect { case r: sbt.librarymanagement.MavenRepository => r.root }
-              val nativeCredentials = configuredCredentials.map(_.asInstanceOf[AnyRef])
-              val digest = java.security.MessageDigest.getInstance("SHA-256")
-                .digest(Files.readAllBytes(config.toPath)).map(b => f"${b & 0xff}%02x").mkString
-              if (seen.add((plugin.getClass.getClassLoader, config, digest, repositories, nativeCredentials))) {
-                state.log.info("[sbt-nix-backend] resolving native Scalafmt session " + config)
-                ScalafmtCapture.resolve(plugin, config, repositories, nativeCredentials)
-              }
-            }
-          }
+    scalafmtConfigs(extracted).foreach { case (plugin, configTask) =>
+      val (s1, configured) = extracted.runTask(configTask, state)
+      val config = configured.getCanonicalFile
+      state = s1
+      if (config.isFile) {
+        val resolverTask = Scoped.scopedTask(configTask.scope, fullResolvers.key)
+        val credentialTask = Scoped.scopedTask(configTask.scope, credentials.key)
+        val (s2, resolvers) = extracted.runTask(resolverTask, state)
+        val (s3, configuredCredentials) = extracted.runTask(credentialTask, s2)
+        state = s3
+        val repositories = resolvers.collect { case r: sbt.librarymanagement.MavenRepository => r.root }
+        val nativeCredentials = configuredCredentials.map(_.asInstanceOf[AnyRef])
+        val digest = java.security.MessageDigest.getInstance("SHA-256")
+          .digest(Files.readAllBytes(config.toPath)).map(b => f"${b & 0xff}%02x").mkString
+        if (seen.add((plugin.getClass.getClassLoader, config, digest, repositories, nativeCredentials))) {
+          state.log.info("[sbt-nix-backend] resolving native Scalafmt session " + config)
+          ScalafmtCapture.resolve(plugin, config, repositories, nativeCredentials)
         }
       }
     }
