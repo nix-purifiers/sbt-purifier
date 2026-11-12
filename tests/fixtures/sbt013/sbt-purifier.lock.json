@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "contentHash": "2c9d549ef67a053e9b3328c10825aeb9cf0a375144a798621836b71ea2379f3b",
+  "contentHash": "97241c05cad77aa34937b2b8e24af69fb75e5738006a067ac2bafc9a3842612d",
   "sbtVersion": "0.13.18",
   "javaVersion": "8",
   "launcher": "https/scala.jfrog.io/artifactory/api/download/ivy-releases/org.scala-sbt/sbt-launch/0.13.18/jars/sbt-launch.jar",
@@ -11,7 +11,7 @@
   "plugin": {
     "organization": "io.github.clhodapp",
     "name": "sbt-nix-backend",
-    "version": "0.0.0-dev.2b88c606586da7fedbee794e06a27dcab5fd7184d58a9cb8c683863d2379a76c",
+    "version": "0.0.0-dev.88bfad4cc1124903803fdc182e0da5afdfb9051ef11e0f27186dabce86bc11d9",
     "via": "global-plugin"
   },
   "projects": [
@@ -120,7 +120,7 @@
     }
   ],
   "flakeRepositories": [],
-  "inputsHash": "cbc4a787d640eb52db0d57043150366279eda0c7465fb1c56eeb9703d8e3cf13",
+  "inputsHash": "798193968960be642c7e31cf08b981f9e644cb4ea0e419af401e2725cc94cc75",
   "definitionHash": "a0b14da317d71cd665bf594423d4faf26255743c4a36477c8e3b73f97534cf82",
   "artifacts": [
     {
