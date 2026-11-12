@@ -450,6 +450,24 @@ in
       doCheck = true;
     }).tests;
 
+  # The native plugin loads its engines dynamically. Exercise both the
+  # HOCON-included default and a task-scoped override without formatting files.
+  scalafmt-session =
+    let
+      project = buildSbtProject {
+        src = ./fixtures/scalafmt-session;
+        pluginRepository = plugin-repository;
+        doCheck = true;
+      };
+      command = "nixSandboxBuild --test scalafmt-session";
+    in
+    project.packages.scalafmt-session.overrideAttrs (original: {
+      buildPhase =
+        assert lib.hasInfix command original.buildPhase;
+        builtins.replaceStrings [ command ] [ ";scalafmtCheckAll;scalafmtSbtCheck;${command}" ]
+          original.buildPhase;
+    });
+
   nix-library = import ./nix-library.nix { inherit pkgs overlay flakeLib; };
 
   # Feature 1: the coursier cache of the multi fixture.
