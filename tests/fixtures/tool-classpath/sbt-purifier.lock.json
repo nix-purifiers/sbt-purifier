@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "contentHash": "226a9ff3c7cb07998835f7024fd94c7a51b5dd9d926fe1657d0a2a400f02b0d6",
+  "contentHash": "f982343d282fb7fb1e07b899b2449e85587397c048d0034750b54878a5448a8f",
   "sbtVersion": "1.13.1",
   "javaVersion": "21",
   "launcher": "https/repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.13.1/sbt-launch-1.13.1.jar",
@@ -11,7 +11,7 @@
   "plugin": {
     "organization": "io.github.clhodapp",
     "name": "sbt-nix-backend",
-    "version": "0.1.0",
+    "version": "0.0.0-dev.8c4982c1ab0ea06638da70256ba0d303e4a47c49297ae9cbecd4ef08d0aa9b70",
     "via": "global-plugin"
   },
   "projects": [
@@ -74,7 +74,7 @@
     }
   ],
   "flakeRepositories": [],
-  "inputsHash": "d5c5faa88c7d3cfc2f7d5af056d7314bc8248ab17cec58735b28c6a14c74711b",
+  "inputsHash": "6387133831355b18253afecea9b4c87c3e8c09f44f88d2884444b5082ff16b8b",
   "definitionHash": "7087e0766d8bdd9acd71ab04aa2e3d6b2677e2d93e4fc0a3036bb70e63aa96a5",
   "artifacts": [
     {
@@ -780,6 +780,38 @@
         "https://maven-central.storage-download.googleapis.com/maven2/com/swoval/file-tree-views/2.1.12/file-tree-views-2.1.12.pom.sha1"
       ],
       "hash": "sha256-kI6+awnPk/VW5Fu+v4G3HIgyxWrrzG6kRVg/U+xNfW0="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/typesafe/config/1.4.10/config-1.4.10.jar",
+      "url": "https://repo1.maven.org/maven2/com/typesafe/config/1.4.10/config-1.4.10.jar",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/typesafe/config/1.4.10/config-1.4.10.jar"
+      ],
+      "hash": "sha256-vgOvVcnLqDXor69usKObpx7TII1Us5GfsLyVzgveAAI="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/typesafe/config/1.4.10/config-1.4.10.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/com/typesafe/config/1.4.10/config-1.4.10.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/typesafe/config/1.4.10/config-1.4.10.jar.sha1"
+      ],
+      "hash": "sha256-AlloYNhdo0DgTh3jrAGvrG1WUMQFTmF4gq79lwWt4/0="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/typesafe/config/1.4.10/config-1.4.10.pom",
+      "url": "https://repo1.maven.org/maven2/com/typesafe/config/1.4.10/config-1.4.10.pom",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/typesafe/config/1.4.10/config-1.4.10.pom"
+      ],
+      "hash": "sha256-shw/BPSptmvtnecYOl5FiuKIArb8UyxePSNVoatotJM="
+    },
+    {
+      "path": "https/repo1.maven.org/maven2/com/typesafe/config/1.4.10/config-1.4.10.pom.sha1",
+      "url": "https://repo1.maven.org/maven2/com/typesafe/config/1.4.10/config-1.4.10.pom.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/com/typesafe/config/1.4.10/config-1.4.10.pom.sha1"
+      ],
+      "hash": "sha256-Aw1YZERGjNqn1evX/s7s+OSQNkyXc60BAezcMEYcXPs="
     },
     {
       "path": "https/repo1.maven.org/maven2/com/typesafe/config/1.4.5/config-1.4.5-sources.jar",
