@@ -334,6 +334,10 @@ in
         pkgs.python3
       ];
       text = ''
+        # A and B must use the same Java major as the committed fixture lock.
+        # The runtime-adoption check exercises arbitrary caller Java separately.
+        export JAVA_HOME="''${SBT_PURIFIER_TEST_JAVA_HOME:-${pkgs.jdk.home}}"
+        export JAVACMD="$JAVA_HOME/bin/java"
         exec python ${./implementation-lifecycle.py} \
           --baseline ${./implementation-baseline.json} \
           --bootstrap ${bootstrap.tool} --source-model ${bootstrap.sourceModel} "$@"
@@ -832,6 +836,12 @@ in
 
 }
 // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+  local-java-runtime = import ./local-java.nix {
+    inherit pkgs;
+    wrapper = withOverlay.sbt-purifier.sbt;
+    dependencies = multi.dependencies;
+    fixture = ./fixtures/multi;
+  };
   ivy-native-state = import ./ivy-state.nix {
     inherit pkgs;
     sdk = multi;
