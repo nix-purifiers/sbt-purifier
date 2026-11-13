@@ -103,6 +103,18 @@ class ReleaseSourceTest(unittest.TestCase):
             check(good, main="0" * 40)
         with self.assertRaises(RuntimeError):
             check(good, requested="0" * 40)
+        path = self.root / "src/Plugin.scala"
+        path.write_text("dirty tracked source\n")
+        with self.assertRaisesRegex(RuntimeError, "Tracked release sources changed"):
+            check(good)
+        self.git("add", "src/Plugin.scala")
+        with self.assertRaisesRegex(RuntimeError, "Tracked release sources changed"):
+            check(good)
+        # Untracked build products do not alter Git flake source selection.
+        path.write_text("old\n")
+        self.git("add", "src/Plugin.scala")
+        (self.root / "build-output").write_text("untracked\n")
+        check(good)
 
     def test_actual_workflow_decision_with_equal_maven_bytes(self):
         # Execute the production Bash decision, replacing only external API

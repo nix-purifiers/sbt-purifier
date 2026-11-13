@@ -30,6 +30,8 @@ def api(repository, suffix):
 def guard(repository, sha):
     if not re.fullmatch(r"[0-9a-f]{40}", sha) or git("rev-parse", "HEAD").decode().strip() != sha:
         raise RuntimeError("Release checkout does not match the requested exact commit")
+    if git("status", "--porcelain", "--untracked-files=no").strip():
+        raise RuntimeError("Tracked release sources changed; refusing to publish bytes outside the commit")
     if api(repository, "git/ref/heads/main")["object"]["sha"] != sha:
         raise RuntimeError("Main advanced; refusing to publish the stale commit")
     runs = api(repository, f"actions/workflows/check.yml/runs?branch=main&head_sha={sha}&per_page=100")
