@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "contentHash": "ce702414e3686e6c408bd5d73f8a5b88d9313fe629c5d1d77b307100602b4f81",
+  "contentHash": "d8c8a9aecd0cd6ee5db0087a042e71ad547b507af8a2c3b89c86d382ebb8a326",
   "sbtVersion": "1.11.7",
   "javaVersion": "21",
   "launcher": "https/repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.11.7/sbt-launch-1.11.7.jar",
@@ -11,7 +11,7 @@
   "plugin": {
     "organization": "io.github.clhodapp",
     "name": "sbt-nix-backend",
-    "version": "0.1.0",
+    "version": "0.0.0-dev.2b88c606586da7fedbee794e06a27dcab5fd7184d58a9cb8c683863d2379a76c",
     "via": "global-plugin"
   },
   "projects": [
@@ -87,7 +87,7 @@
       "attribute": "multi-app"
     }
   ],
-  "inputsHash": "752f5310ae8cbc703ef80c3c0cb0d5dbc53f8f025703083c7e123ecc295b1891",
+  "inputsHash": "67be8c79ed19fed7feb2fa454690d8f64e4b727d6ffa96b18eb58d8efc24999e",
   "definitionHash": "51f57c57b654c67c2debeec0df59830fbdb4128a4394dabe5b4d3251a49dd84f",
   "artifacts": [
     {
@@ -5923,6 +5923,14 @@
       "hash": "sha256-+Soglax1AIdk/jsreT/+YkxPvvW/2bACLkvC2vZoxlE="
     },
     {
+      "path": "https/repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.11.7/sbt-launch-1.11.7.jar.sha1",
+      "url": "https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.11.7/sbt-launch-1.11.7.jar.sha1",
+      "mirrors": [
+        "https://maven-central.storage-download.googleapis.com/maven2/org/scala-sbt/sbt-launch/1.11.7/sbt-launch-1.11.7.jar.sha1"
+      ],
+      "hash": "sha256-FLIzHtGeKvSztXJK+h00fyChN/KOhmOyrSvPcSG8ZAw="
+    },
+    {
       "path": "https/repo1.maven.org/maven2/org/scala-sbt/sbt/1.11.7/sbt-1.11.7-sources.jar",
       "url": "https://repo1.maven.org/maven2/org/scala-sbt/sbt/1.11.7/sbt-1.11.7-sources.jar",
       "mirrors": [
@@ -7410,5 +7418,6 @@
       ],
       "hash": "sha256-pXjMItF3b0vRRWE5NPqsZi7usICCtrh1mtgIf//EZq8="
     }
-  ]
+  ],
+  "buildDirectory": "consumer"
 }

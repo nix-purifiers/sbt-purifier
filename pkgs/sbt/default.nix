@@ -172,6 +172,7 @@ writeTextFile {
     # variable names; naming the wrapper's own repository there gives that
     # build the jar the wrapper injects, so one plugin build runs.
     export SBT_NIX_BACKEND_REPOSITORY=${pluginRepository}
+    export SBT_NIX_BACKEND_PLUGIN_VERSION=${lib.escapeShellArg pluginVersion}
     # sbt caches the resolution of the global plugin by its module and
     # version, which a plugin built from newer sources shares with the
     # one before it. sbt 2 keeps it in the build's own

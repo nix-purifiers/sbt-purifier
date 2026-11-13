@@ -223,7 +223,7 @@ other_wrapper=$(nix build --no-link --print-out-paths --impure --argstr root "$r
   in
   implementation.wrap (pkgs.callPackage (root + "/pkgs/sbt") {
     inherit implementation;
-    pluginVersion = builtins.replaceStrings [ "\n" ] [ "" ] (builtins.readFile (root + "/version.txt"));
+    pluginVersion = (import (root + "/nix/lib/source-version.nix") root).version;
     pluginRepository = pkgs.runCommand "plugin-repository-copy" { } "cp -r ${sbt.pluginRepository} $out";
   })')
 use_fixture ivy

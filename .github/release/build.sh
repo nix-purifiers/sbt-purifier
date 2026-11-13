@@ -18,7 +18,7 @@ system=$(nix eval --impure --raw --expr builtins.currentSystem)
 
 out=$(nix build --no-link --print-out-paths --impure --expr "
   ((builtins.getFlake \"git+file://$root\").packages.$system.plugin).overrideAttrs {
-    SBT_NIX_BACKEND_RELEASE_VERSION = \"$version\";
+    version = \"$version\";
   }")
 
 mkdir -p "$dir"

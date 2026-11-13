@@ -199,7 +199,7 @@ let
         ]
         || throw "sbt-purifier: the lock reaches the plugin via '${p.via}', which this library does not know";
       {
-        inherit (p) via;
+        inherit (p) via version;
         inherit repo;
         file = writeText "sbt-nix-backend-plugin.sbt" (
           ''
@@ -259,6 +259,7 @@ let
       # wrapper sets it too, so a lock made with the wrapper and such a
       # build needs it as well as the global plugin.
       export SBT_NIX_BACKEND_REPOSITORY=${plugin.repo}
+      export SBT_NIX_BACKEND_PLUGIN_VERSION=${lib.escapeShellArg plugin.version}
     ''}
     ${lib.optionalString (projectDependencies != [ ]) ''
       export SBT_PURIFIER_PROVIDED_REPOSITORY=${provided.maven}

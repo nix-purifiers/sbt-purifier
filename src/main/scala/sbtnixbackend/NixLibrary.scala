@@ -30,7 +30,8 @@ object NixLibrary {
       "purifier-source.nix",
       "read-lock.nix",
       "realize.nix",
-      "source-readable.nix"
+      "source-readable.nix",
+      "source-version.nix"
     )
 
   private[sbtnixbackend] def resource(name: String): Array[Byte] = {

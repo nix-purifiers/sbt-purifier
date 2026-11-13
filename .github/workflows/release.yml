@@ -7,8 +7,8 @@
 #
 # Versions are <series>.<revision>, the series in .github/release/series
 # and the revision counted by the tags of that series: v0.1.1, v0.1.2, and
-# so on. (Builds from source, which every lockfile in this repository is
-# made with, have the version in build.sbt, 0.1.0.) The run builds the
+# so on. Source builds use a version derived from their plugin source bytes;
+# release builds receive their version explicitly. The run builds the
 # artifacts of the commit with the last release's version and compares
 # their SHA256SUMS with the SHA256SUMS of that release. The plugin build
 # is reproducible, so equal sums mean nothing a user receives changed,

@@ -44,6 +44,7 @@
         packages = [ pkgs.sbt ];
         JAVA_HOME = pkgs.jdk.home;
         SBT_NIX_BACKEND_REPOSITORY = config.packages.plugin-repository;
+        SBT_NIX_BACKEND_PLUGIN_VERSION = config.packages.plugin.version;
       };
     };
 
