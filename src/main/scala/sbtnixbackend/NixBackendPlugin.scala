@@ -824,10 +824,11 @@ object NixBackendPlugin extends AutoPlugin {
       sys.error("sbt-nix-backend: the plugin was injected but its jar names no coordinates")
     val javaOptions = (ThisBuild / nixSbtJavaOptions).value.toVector
     val launcherUrl = (ThisBuild / nixLauncherUrl).value
+    val toolInputs = scalafmtInputs.value
     val hash = Lock.buildDefinitionHash(
       root,
       Seq("plugin=" + plugin.fold("none")(p => s"${p.organization}:${p.name}:${p.version} via ${p.via}"), "launcher=" + launcherUrl) ++
-        javaOptions.map("javaOption=" + _) ++ urls.map("url=" + _) ++
+        javaOptions.map("javaOption=" + _) ++ urls.map("url=" + _) ++ toolInputs ++
         lockedRepos.map(r => s"flake=${r.name}=${r.locked}#${r.attribute}") ++
         projects.map(p => s"project=${p.id}=${p.organization}:${p.name}") ++
         crossNames.map("published=" + _)
@@ -1076,9 +1077,113 @@ object NixBackendPlugin extends AutoPlugin {
       else sandboxBuild(state0, extracted, flags, ids)
     }
 
+  /** Plugins can resolve an executable tool through a task-scoped classpath,
+    * outside a project's compile/test dependencies. Scala.js's linker is one
+    * example. Resolve those declared classpaths during capture, without running
+    * the tool or its tests, so their native downloads enter the same cache.
+    */
+  private def captureToolClasspaths(extracted: Extracted, state0: State): State = {
+    val tasks = extracted.structure.settings.flatMap { setting =>
+      val scoped = setting.key
+      val scope = scoped.scope
+      val toolScope = scope.task match {
+        case Select(_) => true
+        case _         => false
+      }
+      if (scoped.key == fullClasspath.key && toolScope) Some(Scoped.scopedTask(scope, fullClasspath.key)) else None
+    }.distinct.sortBy(_.scopedKey.toString)
+    tasks.foldLeft(state0) { (state, task) =>
+      state.log.info(s"[sbt-nix-backend] resolving tool classpath ${task.scopedKey}")
+      extracted.runTask(task, state)._1
+    }
+  }
+
+  /** MiMa resolves previous releases through its dependency resolver rather
+    * than a fullClasspath task. Its declared getter downloads those releases
+    * without compiling the current project or running binary analysis.
+    */
+  private def captureMimaPreviousClassfiles(extracted: Extracted, state0: State): State = {
+    val previous = TaskKey[Map[sbt.librarymanagement.ModuleID, File]]("mimaPreviousClassfiles")
+    val tasks = extracted.structure.settings.flatMap { setting =>
+      val scoped = setting.key
+      if (scoped.key == previous.key) Some(Scoped.scopedTask(scoped.scope, previous.key)) else None
+    }.distinct.sortBy(_.scopedKey.toString)
+    tasks.foldLeft(state0) { (state, task) =>
+      state.log.info(s"[sbt-nix-backend] resolving previous classfiles ${task.scopedKey}")
+      extracted.runTask(task, state)._1
+    }
+  }
+
+  private def scalafmtConfigs(extracted: Extracted): Vector[(AutoPlugin, TaskKey[File])] = {
+    val axes = (Zero +: extracted.structure.settings.flatMap { setting =>
+      setting.key.scope.task match {
+        case Select(key) if key.label.startsWith("scalafmt") => Some(setting.key.scope.task)
+        case _ => None
+      }
+    }).distinct
+    extracted.structure.allProjectRefs.toVector.flatMap { ref =>
+      val project = extracted.get(ref / thisProject)
+      project.autoPlugins.find(_.getClass.getName == "org.scalafmt.sbt.ScalafmtPlugin$").toVector.flatMap { plugin =>
+        val configs = ((ref / TaskKey[File]("scalafmtConfig")) +:
+          project.configurations.map(c => ref / c / TaskKey[File]("scalafmtConfig"))).distinct
+        configs.flatMap { config => axes.map(axis => Scoped.scopedTask(config.scope.copy(task = axis), config.key)) }
+          .distinct.filter(Compat.hasTask(extracted, _)).map(plugin -> _)
+      }
+    }
+  }
+
+  private def scalafmtInput(plugin: AutoPlugin, key: TaskKey[File], root: File): Def.Initialize[Task[Option[String]]] =
+    Def.task(Compat.uncached {
+      val config = key.value.getCanonicalFile
+      if (!config.isFile) Option.empty[String]
+      else {
+        val relative = root.toPath.relativize(config.toPath).toString.replace(File.separatorChar, '/')
+        Some("scalafmt=" + relative + "=" + ScalafmtCapture.version(plugin, config))
+      }
+    })
+
+  private def joinScalafmtInputs(tasks: Seq[Def.Initialize[Task[Option[String]]]]): Def.Initialize[Task[Vector[String]]] = {
+    val joined = tasks.join.apply(_.join)
+    Def.task(Compat.uncached { joined.value.flatten.distinct.sorted.toVector })
+  }
+
+  private def scalafmtInputs: Def.Initialize[Task[Vector[String]]] = Def.taskDyn {
+    val root = (ThisBuild / nixBuildRoot).value.getCanonicalFile
+    val configs = scalafmtConfigs(Project.extract(state.value))
+    joinScalafmtInputs(configs.map { case (plugin, key) => scalafmtInput(plugin, key, root) })
+  }
+
+  private def captureScalafmtSessions(extracted: Extracted, state0: State): State = {
+    var state = state0
+    val seen = scala.collection.mutable.Set.empty[(ClassLoader, File, String, Seq[String], Seq[AnyRef])]
+    scalafmtConfigs(extracted).foreach { case (plugin, configTask) =>
+      val (s1, configured) = extracted.runTask(configTask, state)
+      val config = configured.getCanonicalFile
+      state = s1
+      if (config.isFile) {
+        val resolverTask = Scoped.scopedTask(configTask.scope, fullResolvers.key)
+        val credentialTask = Scoped.scopedTask(configTask.scope, credentials.key)
+        val (s2, resolvers) = extracted.runTask(resolverTask, state)
+        val (s3, configuredCredentials) = extracted.runTask(credentialTask, s2)
+        state = s3
+        val repositories = resolvers.collect { case r: sbt.librarymanagement.MavenRepository => r.root }
+        val nativeCredentials = configuredCredentials.map(_.asInstanceOf[AnyRef])
+        val digest = java.security.MessageDigest.getInstance("SHA-256")
+          .digest(Files.readAllBytes(config.toPath)).map(b => f"${b & 0xff}%02x").mkString
+        if (seen.add((plugin.getClass.getClassLoader, config, digest, repositories, nativeCredentials))) {
+          state.log.info("[sbt-nix-backend] resolving native Scalafmt session " + config)
+          ScalafmtCapture.resolve(plugin, config, repositories, nativeCredentials)
+        }
+      }
+    }
+    state
+  }
+
   private def sandboxBuild(state0: State, extracted: Extracted, flags: Seq[String], ids: Seq[String]): State = {
     val structure = extracted.structure
-    var state = state0
+    var state = if (Mode.current == Mode.Lock)
+      captureToolClasspaths(extracted, captureMimaPreviousClassfiles(extracted,
+        captureScalafmtSessions(extracted, state0))) else state0
     def run[T](key: TaskKey[T]): T = {
       val (s, v) = extracted.runTask(key, state)
       state = s
