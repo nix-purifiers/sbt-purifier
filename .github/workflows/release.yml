@@ -1,29 +1,13 @@
 # SPDX-License-Identifier: MIT
 #
-# Releases the plugin when what it publishes changed. It runs after each
-# successful check of a push to main (and when started by hand, or by
-# update.yml after it pushes an upstream bump), so a commit is released
-# only once its checks passed.
-#
-# Versions are <series>.<revision>, the series in .github/release/series
-# and the revision counted by the tags of that series: v0.1.1, v0.1.2, and
-# so on. Source builds use a version derived from their plugin source bytes;
-# release builds receive their version explicitly. The run builds the
-# artifacts of the commit with the last release's version and compares
-# their SHA256SUMS with the SHA256SUMS of that release. The plugin build
-# is reproducible, so equal sums mean nothing a user receives changed,
-# whether the commit moved a pin (nixpkgs, sbt) or changed code. Otherwise
-# it builds them with the next revision and publishes them:
-#
-#  - as a GitHub release tagged v<version> at the commit, with the
-#    artifacts as a zip in Maven layout and their SHA256SUMS. The releases
-#    are the only copy of the artifacts; none is in git.
-#  - into the Maven repository that GitHub Pages serves at
-#    https://nix-purifiers.github.io/sbt-purifier/maven. The site is built
-#    from the zips of every release (.github/release/pages.sh) and
-#    given central documentation redirects and deployed as one Pages artifact.
-#    The combined site is refreshed after every successful main check, even
-#    when the plugin artifacts are unchanged.
+# Releases checked main commits when Maven artifacts or the complete tracked
+# source tree differ from the previous release. The source comparison covers
+# native CLI/runtime exports that the plugin-only artifact comparison misses.
+# Full-tree identity is conservative: documentation-only changes also release.
+# Versions remain automatic <series>.<revision>. Every release retains the
+# existing versioned Maven zip and Maven-layout SHA256SUMS, and additionally
+# attaches an exact-commit source archive, manifest and SOURCE-SHA256SUMS.
+# Old Maven consumers and Pages downloads keep their existing coordinates.
 #
 # Started by hand with `deploy`, the run rebuilds and deploys the site
 # whether or not it releases. A new series (a manual edit of
@@ -103,6 +87,7 @@ jobs:
             echo "release=false" >>"$GITHUB_OUTPUT"
             exit 0
           fi
+          python3 .github/release/source.py guard "$GITHUB_REPOSITORY" "$SHA"
           series=$(cat .github/release/series)
           last=$(git tag -l "v$series.*" | sort -V | tail -n 1)
           if [[ -z $last ]]; then
@@ -113,9 +98,11 @@ jobs:
           fi
           .github/release/build.sh "${last#v}" "$RUNNER_TEMP/last"
           gh release download "$last" --pattern SHA256SUMS --dir "$RUNNER_TEMP/released"
-          if cmp -s "$RUNNER_TEMP/last/SHA256SUMS" "$RUNNER_TEMP/released/SHA256SUMS"; then
+          previous_source=$(python3 .github/release/source.py fingerprint "$last^{commit}")
+          current_source=$(python3 .github/release/source.py fingerprint "$SHA")
+          if [[ "$previous_source" == "$current_source" ]] && cmp -s "$RUNNER_TEMP/last/SHA256SUMS" "$RUNNER_TEMP/released/SHA256SUMS"; then
             echo "release=false" >>"$GITHUB_OUTPUT"
-            echo "$SHA builds what $last published; nothing to release."
+            echo "$SHA matches both the sources and Maven artifacts of $last; nothing to release."
             exit 0
           fi
           echo "What $SHA builds differs from $last:"
@@ -130,7 +117,9 @@ jobs:
           VERSION: ${{ steps.decide.outputs.version }}
         run: |
           set -euo pipefail
+          python3 .github/release/source.py guard "$GITHUB_REPOSITORY" "$SHA"
           .github/release/build.sh "$VERSION" "$RUNNER_TEMP/release"
+          python3 .github/release/source.py prepare "$GITHUB_REPOSITORY" "$SHA" "$VERSION" "$RUNNER_TEMP/source"
           zip="$RUNNER_TEMP/sbt-nix-backend-$VERSION-maven.zip"
           (cd "$RUNNER_TEMP/release" && zip -qr "$zip" . -x SHA256SUMS)
           nixpkgs=$(jq -r '.nodes[.nodes.root.inputs.nixpkgs].locked.rev' flake.lock)
@@ -154,8 +143,11 @@ jobs:
             echo "| sbt 1 | $sbt1 |"
             echo "| sbt 2 | $sbt2 |"
           } >"$RUNNER_TEMP/notes.md"
+          python3 .github/release/source.py guard "$GITHUB_REPOSITORY" "$SHA"
           gh release create "v$VERSION" --target "$SHA" --title "v$VERSION" --notes-file "$RUNNER_TEMP/notes.md" \
-            "$zip" "$RUNNER_TEMP/release/SHA256SUMS"
+            "$zip" "$RUNNER_TEMP/release/SHA256SUMS" \
+            "$RUNNER_TEMP/source/source.tar.gz" "$RUNNER_TEMP/source/release-manifest.json" \
+            "$RUNNER_TEMP/source/SOURCE-SHA256SUMS"
 
       - name: Check out shared native publication infrastructure
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
