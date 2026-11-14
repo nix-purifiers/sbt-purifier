@@ -107,6 +107,31 @@ def compose(args, evidence):
         elif args.sbt_version.startswith('2.'):
             definition.write_text(definition.read_text().replace('2.12.20', '3.8.4'))
         env = dict(os.environ, SBT_NIX_BACKEND_MAVEN_CENTRAL_MIRROR='https://repo.maven.apache.org/maven2/')
+        # This matrix point exercises legacy sbt/Scala on its explicit test
+        # profile. The wrapper itself continues to use the caller's Java.
+        if args.sbt_version.startswith('0.13.'):
+            legacy_home = os.environ.get('SBT_PURIFIER_TEST_LEGACY_JAVA_HOME') or evidence.output(
+                ['nix', 'develop', producer_reference + '#legacy-tests', '--command', 'printenv', 'JAVA_HOME'],
+                text=True).strip()
+            env.update(JAVA_HOME=legacy_home, JAVACMD=str(Path(legacy_home) / 'bin/java'))
+            env['PATH'] = str(Path(legacy_home) / 'bin') + os.pathsep + env.get('PATH', '')
+            evidence.receipt['testJvmProfile'] = {'name': 'legacy-tests', 'home': legacy_home}
+        else:
+            # The runner image's own Java changes with the image; pin the native
+            # build to the JDK the downstream Maven consumer runs below, so the
+            # published classes target a runtime that consumer can load.
+            jdk_expression = """let
+              f = builtins.getFlake (builtins.getEnv "COMPOSITION_FLAKE");
+              p = f.inputs.nixpkgs.legacyPackages.${builtins.currentSystem};
+            in p.runCommand "sbt-composition-native-jdk" {} ''
+              ln -s ${p.jdk21_headless.home} "$out"
+            '' """
+            native_home = evidence.output(['nix', 'build', '--impure', '--print-out-paths',
+                '--out-link', str(temporary / 'native-jdk'), '--expr', jdk_expression], text=True,
+                env=dict(os.environ, COMPOSITION_FLAKE=producer_reference)).strip()
+            env.update(JAVA_HOME=native_home, JAVACMD=str(Path(native_home) / 'bin/java'))
+            env['PATH'] = str(Path(native_home) / 'bin') + os.pathsep + env.get('PATH', '')
+            evidence.receipt['testJvmProfile'] = {'name': 'jdk21-headless', 'home': native_home}
         def run(*commands):
             output = evidence.output([str(sbt), '-batch', ';' + ';'.join(commands)], cwd=project, env=env, text=True)
             evidence.receipt.setdefault('nativeCommandsPassed', []).append(list(commands))
@@ -135,9 +160,11 @@ def compose(args, evidence):
         java_version = re.search(r'COMPOSITION_JAVA_VERSION\|([^\r\n]+)', plain_native).group(1).strip()
         java_major = java_version.split('.')[1] if java_version.startswith('1.') else java_version.split('.')[0]
         assert java_major == locked['javaVersion'], 'actual project JVM differs from lock'
-        assert java_home.startswith('/nix/store/'), 'native JVM must have an immutable SDK identity'
-        evidence.receipt['nativeJvm'] = {'home': java_home, 'version': java_version, 'role': 'native-project-runtime'}
-        evidence.selected('native-project-jdk', '/'.join(java_home.split('/')[:4]))
+        java_binary = (Path(java_home) / 'bin/java').resolve(strict=True)
+        evidence.receipt['nativeJvm'] = {'home': java_home, 'version': java_version,
+            'role': 'native-project-runtime', 'binary': str(java_binary), 'binarySha256': sha256(java_binary)}
+        if java_home.startswith('/nix/store/'):
+            evidence.selected('native-project-jdk', '/'.join(java_home.split('/')[:4]))
         native_dependencies = observed_origins(plain_native,
             {'org.apache.commons.text.WordUtils', 'org.apache.commons.lang3.StringUtils'})
         provider_jar = Path(provider) / 'org/apache/commons/commons-lang3/0.0.1/commons-lang3-0.0.1.jar'

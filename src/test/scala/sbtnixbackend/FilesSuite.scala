@@ -117,13 +117,18 @@ class FilesSuite extends munit.FunSuite {
   }
 
   test("the plugin carries every file of the Nix library, and the flake.lock") {
-    val dir = new File("nix/lib")
-    assume(dir.isDirectory, "the tests run from the repository root")
-    assertEquals(NixLibrary.files, (dir.list().toVector.filter(n => n.endsWith(".nix") || n.endsWith(".sbt")) :+ "flake.lock").sorted)
+    val manifest = new File("pkgs/plugin/resources.tsv")
+    assert(manifest.isFile, "resource manifest must exist in the plugin source")
+    val expected = scala.io.Source.fromFile(manifest)
+    val sources = try expected.getLines().filter(_.nonEmpty).map { line =>
+      val columns = line.split("\t", 2)
+      (columns(0), columns(1))
+    }.toVector finally expected.close()
+    assertEquals(NixLibrary.sources, sources)
     val out = tempDir()
     NixLibrary.write(out)
-    NixLibrary.files.foreach { n =>
-      val source = if (n == "flake.lock") new File(n) else new File(dir, n)
+    sources.foreach { case (n, sourcePath) =>
+      val source = new File(sourcePath)
       assertEquals(
         Files.readAllBytes(new File(out, n).toPath).toSeq,
         Files.readAllBytes(source.toPath).toSeq,

@@ -181,7 +181,7 @@ object Lock {
     * `  "contentHash": "<hex>",` after its version line. The hash is the
     * SHA-256 of `text`. The line has a fixed place and shape so that Nix
     * can check it with string functions before it parses the JSON (see
-    * nix/lib/read-lock.nix).
+    * lib-overlays/default/read-lock.nix).
     */
   def withContentHash(text: String): String = {
     val afterVersion = text.indexOf('\n', text.indexOf('\n') + 1) + 1
@@ -271,7 +271,7 @@ object Lock {
     * line `<path> <SHA-256 of the file, in hex>` for each file, in name
     * order at each level, and then one line `extra <string>` for each of
     * `extra`. With no extra strings, buildSbtProject computes the same
-    * digest from its source (nix/lib/definition-hash.nix). The extra
+    * digest from its source (lib-overlays/default/definition-hash.nix). The extra
     * strings cover dependency inputs that live outside those files (the
     * injected plugin, declared network URLs, flake references).
     */

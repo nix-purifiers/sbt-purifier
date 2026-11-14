@@ -12,7 +12,7 @@
 }:
 let
   # The wrapper boots from a lock it has checked; only the downloads count.
-  read = import ./read-lock.nix {
+  read = import ../../../lib-overlays/default/read-lock.nix {
     src = null;
     inherit lockFile;
   };

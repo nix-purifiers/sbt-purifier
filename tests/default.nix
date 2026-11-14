@@ -334,6 +334,10 @@ in
         pkgs.python3
       ];
       text = ''
+        # A and B must use the same Java major as the committed fixture lock.
+        # The runtime-adoption check exercises arbitrary caller Java separately.
+        export JAVA_HOME="''${SBT_PURIFIER_TEST_JAVA_HOME:-${pkgs.jdk.home}}"
+        export JAVACMD="$JAVA_HOME/bin/java"
         exec python ${./implementation-lifecycle.py} \
           --baseline ${./implementation-baseline.json} \
           --bootstrap ${bootstrap.tool} --source-model ${bootstrap.sourceModel} "$@"
@@ -422,9 +426,9 @@ in
   implementation-mode =
     pkgs.runCommand "sbt-purifier-implementation-mode" { nativeBuildInputs = [ pkgs.python3 ]; }
       ''
-        mkdir -p tests nix/lib
+        mkdir -p tests pkgs/sbt
         cp ${./test_implementation_mode.py} tests/test_implementation_mode.py
-        cp ${../nix/lib/implementation-mode.py} nix/lib/implementation-mode.py
+        cp ${../pkgs/sbt/implementation-mode.py} pkgs/sbt/implementation-mode.py
         python -B tests/test_implementation_mode.py
         touch "$out"
       '';
@@ -437,6 +441,49 @@ in
   independent-sample-sbt1 = independent.tests;
   independent-sample-offline-tasks = independent.offline;
   sbt2-tests = sbt2.tests;
+
+  # Capture task-scoped tool dependencies used by an isolated runtime loader.
+  tool-classpath-runtime =
+    (buildSbtProject {
+      src = ./fixtures/tool-classpath;
+      pluginRepository = plugin-repository;
+      doCheck = true;
+    }).tests;
+
+  # The native plugin loads its engines dynamically. Exercise both the
+  # HOCON-included default and a task-scoped override without formatting files.
+  scalafmt-session =
+    let
+      project = buildSbtProject {
+        src = ./fixtures/scalafmt-session;
+        pluginRepository = plugin-repository;
+        doCheck = true;
+      };
+      command = "nixSandboxBuild --test scalafmt-session";
+    in
+    project.packages.scalafmt-session.overrideAttrs (original: {
+      buildPhase =
+        assert lib.hasInfix command original.buildPhase;
+        builtins.replaceStrings [ command ] [ ";scalafmtCheckAll;scalafmtSbtCheck;${command}" ]
+          original.buildPhase;
+    });
+
+  # MiMa resolves previous releases outside the current project's classpath.
+  # Load the returned JAR through an isolated loader in the pure build.
+  mima-session =
+    let
+      project = buildSbtProject {
+        src = ./fixtures/mima-session;
+        pluginRepository = plugin-repository;
+        doCheck = true;
+      };
+      command = "nixSandboxBuild --test mima-session";
+    in
+    project.packages.mima-session.overrideAttrs (original: {
+      buildPhase =
+        assert lib.hasInfix command original.buildPhase;
+        builtins.replaceStrings [ command ] [ ";verifyPrevious;${command}" ] original.buildPhase;
+    });
 
   nix-library = import ./nix-library.nix { inherit pkgs overlay flakeLib; };
 
@@ -832,6 +879,12 @@ in
 
 }
 // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+  local-java-runtime = import ./local-java.nix {
+    inherit pkgs;
+    wrapper = withOverlay.sbt-purifier.sbt;
+    dependencies = multi.dependencies;
+    fixture = ./fixtures/multi;
+  };
   ivy-native-state = import ./ivy-state.nix {
     inherit pkgs;
     sdk = multi;

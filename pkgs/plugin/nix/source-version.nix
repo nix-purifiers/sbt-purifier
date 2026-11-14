@@ -7,7 +7,9 @@ let
     "flake.lock"
     "project"
     "src"
-    "nix"
+    "lib-overlays"
+    "pkgs"
+    "tools"
     "sbt-purifier.lock.json"
   ];
   files =

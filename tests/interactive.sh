@@ -18,6 +18,11 @@ set -euo pipefail
 
 root=$(cd "$(dirname "$0")/.." && pwd)
 sbt_wrapper=$(nix build --no-link --print-out-paths "$root#sbt")
+# These fixtures have committed Java 21 locks; choose that test profile
+# explicitly, independently of the runner's host Java. The local-runtime
+# check separately exercises a caller-provided Java outside the store.
+test_java_home=${SBT_PURIFIER_TEST_JAVA_HOME:-$(nix develop "$root" --command printenv JAVA_HOME)}
+legacy_java_home=${SBT_PURIFIER_TEST_LEGACY_JAVA_HOME:-$(nix develop "$root#legacy-tests" --command printenv JAVA_HOME)}
 
 # Short, for sbt's boot socket under $work/<fixture>-run (a Unix socket path
 # is limited to 104 bytes on macOS, where mktemp is under /var/folders), and
@@ -87,7 +92,9 @@ run_sbt() {
   if [[ $runner == plain ]]; then
     (cd "$build" && nix develop "$root" -c sbt --server -batch "$@") 2>&1 | tee -a "$work/sbt.log"
   else
-    (cd "$build" && "$sbt_wrapper/bin/sbt" --server -batch "$@") 2>&1 | tee -a "$work/sbt.log"
+    local java_home=$test_java_home
+    [[ $fixture == sbt013 ]] && java_home=$legacy_java_home
+    (cd "$build" && "$sbt_wrapper/bin/sbt" --server --java-home "$java_home" -batch "$@") 2>&1 | tee -a "$work/sbt.log"
   fi
 }
 
@@ -128,8 +135,10 @@ interactive_suite() {
   expect "$fixture: the locked downloads have a GC root" test -L "$build/.sbt-purifier/gcroots/coursier-cache"
 
   echo "== $fixture: nixPackagedArtifacts"
-  output=$(run_sbt 'show app/nixPackagedArtifacts' 'show app/nixRuntimeRepository') ||
+  output=$(run_sbt 'show app/nixPackagedArtifacts' 'show app/nixRuntimeRepository') || {
+    printf '%s\n' "$output" >&2
     fail "$fixture: nixPackagedArtifacts failed"
+  }
   expect "$fixture: nixPackagedArtifacts returns the jar the Nix build made" has "$jar"
   expect "$fixture: nixRuntimeRepository returns the repository output" has 'app_[0-9.]+-repository'
 
@@ -223,7 +232,7 @@ other_wrapper=$(nix build --no-link --print-out-paths --impure --argstr root "$r
   in
   implementation.wrap (pkgs.callPackage (root + "/pkgs/sbt") {
     inherit implementation;
-    pluginVersion = (import (root + "/nix/lib/source-version.nix") root).version;
+    pluginVersion = (import (root + "/pkgs/plugin/nix/source-version.nix") root).version;
     pluginRepository = pkgs.runCommand "plugin-repository-copy" { } "cp -r ${sbt.pluginRepository} $out";
   })')
 use_fixture ivy

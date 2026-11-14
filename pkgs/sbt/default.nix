@@ -31,17 +31,35 @@
   implementation,
 }:
 let
+  # The pinned nixpkgs recipe appends a fixed -java-home to conf/sbtopts.
+  # Keep the upstream runner's Java selection and project compatibility checks.
+  # Its installation check assumes that bundled runtime; exercise this variant
+  # with an actual caller-provided runtime instead.
+  nativeSbt = pkgs.sbt.overrideAttrs {
+    postPatch = "";
+    doInstallCheck = false;
+  };
   injectText = ''
     resolvers += MavenRepository("sbt-nix-backend-plugin", "file://${pluginRepository}")
     addSbtPlugin("io.github.clhodapp" % "sbt-nix-backend" % "${pluginVersion}")
   '';
   inject = writeText "sbt-nix-backend-plugin.sbt" injectText;
   legacyInject = writeText "sbt-purifier-legacy-plugin.sbt" (
-    injectText + builtins.readFile ../../nix/lib/legacy-global-settings.sbt
+    injectText + builtins.readFile ./legacy-global-settings.sbt
   );
   legacyLauncher = pkgs.fetchurl {
     url = "https://scala.jfrog.io/artifactory/api/download/ivy-releases/org.scala-sbt/sbt-launch/0.13.18/jars/sbt-launch.jar";
     hash = "sha256-ZvklAnUM2fxS3RAg071BQK+ptYC9I6dGMrP/RMxzqbI=";
+  };
+  # dependencies.nix imports the lock reader from lib-overlays/default by a
+  # relative path, so both directories go to the store at their places in
+  # the repository.
+  dependencySource = lib.fileset.toSource {
+    root = ../..;
+    fileset = lib.fileset.unions [
+      ../../lib-overlays/default
+      ../plugin/nix
+    ];
   };
   # The directory name changes with the plugin, so a new plugin version
   # never meets the old one's resolution in target/.
@@ -78,8 +96,8 @@ writeTextFile {
         ;;
     esac
     if [ "$implementation_pinned" = 1 ]; then
-      ${pkgs.python3}/bin/python ${../../nix/lib/implementation-mode.py} \
-        --sbt-home ${pkgs.sbt}/share/sbt -- "$@"
+      ${pkgs.python3}/bin/python ${./implementation-mode.py} \
+        --sbt-home ${nativeSbt}/share/sbt -- "$@"
       # sbt 2 defaults to an existing daemon, whose plugin and environment
       # cannot be replaced by changing a client process. Keep the ordinary
       # command in a fresh foreground JVM. This flag is consumed by the runner,
@@ -124,40 +142,20 @@ writeTextFile {
     if [ -n "$lockfile" ] && [ ! -e "$lockfile" ]; then
       echo "sbt-purifier: warning: no sbt-purifier.lock.json found; running sbt impurely. Run \`sbt nixLock\` to use Nix-resolved dependencies." >&2
     fi
-    # sbt runs on nixpkgs' JDK of the Java major the lockfile records, so
-    # a relock records the same major whatever JAVA_HOME the caller has;
-    # without a lockfile, on nixpkgs' default JDK.
-    export JAVA_HOME=${pkgs.jdk.home}
-    if [ "$legacy" = 1 ]; then export JAVA_HOME=${pkgs.jdk8_headless.home}; fi
+    # Local adoption uses the caller's Java runtime. The upstream runner
+    # handles JAVACMD, JAVA_HOME, PATH and explicit --java-home arguments.
+    # Packaged SDK selection belongs to a full sandboxed project build.
     boot_pinned=0
-    if [ -n "$lockfile" ] && [ -f "$lockfile" ]; then
-      major=$(sed -n 's/^  "javaVersion": "\([0-9]*\)",$/\1/p' "$lockfile")
-      if [ -n "$major" ]; then
-        mkdir -p target/sbt-purifier/gcroots
-        if jdk=$(nix-build ${pkgs.path} -A "javaPackages.compiler.openjdk$major.headless" \
-          --out-link target/sbt-purifier/gcroots/jdk 2>/dev/null); then
-          # OpenJDK's Java home is lib/openjdk. On darwin the attribute is
-          # Zulu, whose store path is a Java home itself.
-          if [ -d "$jdk/lib/openjdk" ]; then
-            export JAVA_HOME="$jdk/lib/openjdk"
-          else
-            export JAVA_HOME="$jdk"
-          fi
-        else
-          echo "sbt-purifier: nixpkgs has no headless OpenJDK $major, the Java major $lockfile records; sbt runs on $JAVA_HOME" >&2
-        fi
-      fi
-    fi
     if [ -n "$lockfile" ] && [ -f "$lockfile" ] && [ -f project/build.properties ]; then
       locked=$(sed -n 's/^  "sbtVersion": "\(.*\)",$/\1/p' "$lockfile")
       wanted=$(sed -n 's/^[[:space:]]*sbt\.version[[:space:]]*=[[:space:]]*\([^[:space:]]*\).*/\1/p' project/build.properties)
       # A lockfile of another format (made by another plugin version) is
       # one nixLock replaces; until then, sbt boots the usual way.
       format=$(sed -n 's/^  "version": \([0-9]*\),$/\1/p' "$lockfile")
-      if [ -n "$locked" ] && [ "$locked" = "$wanted" ] && [ "$format" = "${toString (import ../../nix/lib/lock-version.nix)}" ]; then
+      if [ -n "$locked" ] && [ "$locked" = "$wanted" ] && [ "$format" = "${toString (import ../../lib-overlays/default/lock-version.nix)}" ]; then
         mkdir -p target/sbt-nix-backend/gcroots
         if tree=$(nix-build --expr \
-          '{ lockFile }: (import ${pkgs.path} { }).callPackage ${../../nix/lib}/dependencies.nix { inherit lockFile; }' \
+          '{ lockFile }: (import ${pkgs.path} { }).callPackage ${dependencySource}/pkgs/plugin/nix/dependencies.nix { inherit lockFile; }' \
           --arg lockFile "$(realpath "$lockfile")" --out-link target/sbt-nix-backend/gcroots/boot-cache); then
           export SBT_NIX_BACKEND_USER_COURSIER_CACHE="''${COURSIER_CACHE:-}"
           export COURSIER_CACHE="$tree"
@@ -202,16 +200,16 @@ writeTextFile {
         locked_launcher=$(sed -n 's/^  "launcher": "\(.*\)",$/\1/p' "$lockfile")
         launcher="$COURSIER_CACHE/$locked_launcher"
         cat > "$dir/launcher-repositories" <<EOF
-    ${import ../../nix/lib/legacy-boot-repositories.nix { base = "file://$COURSIER_CACHE"; }}
+    ${import ../build-sbt-project/legacy-boot-repositories.nix { base = "file://$COURSIER_CACHE"; }}
     EOF
       else
         cat > "$dir/launcher-repositories" <<EOF
-    ${import ../../nix/lib/legacy-boot-repositories.nix { }}
+    ${import ../build-sbt-project/legacy-boot-repositories.nix { }}
     EOF
       fi
       export SBT_OPTS="$SBT_OPTS -Dsbt.repository.config=$dir/launcher-repositories"
-      exec ${lib.getExe pkgs.sbt} --java-home "$JAVA_HOME" --sbt-jar "$launcher" "$@"
+      exec ${lib.getExe nativeSbt} --sbt-jar "$launcher" "$@"
     fi
-    exec ${lib.getExe pkgs.sbt} --java-home "$JAVA_HOME" "$@"
+    exec ${lib.getExe nativeSbt} "$@"
   '';
 }

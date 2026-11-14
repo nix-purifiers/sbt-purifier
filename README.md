@@ -132,8 +132,10 @@ nix shell 'github:nix-purifiers/sbt-purifier#sbt'
 sbt compile test
 ```
 
-The wrapper runs sbt on nixpkgs' JDK of the Java major the lockfile
-records. Its `sbt-purifier lock` and `sbt-purifier update` commands wrap
+Local commands use your existing Java runtime through `JAVA_HOME`, `JAVACMD`,
+`PATH`, or an explicit `--java-home` argument. Capture records the actual
+Java major. The upstream sbt and project requirements still apply.
+The `sbt-purifier lock` and `sbt-purifier update` commands wrap
 `sbt nixLock` and `sbt nixLockUpdate`; `sbt nixRelock` forces a relock
 while keeping the pinned flake repositories.
 
@@ -282,7 +284,7 @@ credentials or a company mirror replaces the default one. The other
 arguments are `jdk` (the default is nixpkgs' headless JDK of the Java
 major the lock records), `doCheck` (runs `test` in every package build),
 `srcFilter`, `pluginRepository` and `flakeRepositories`;
-`nix/lib/build-sbt-project.nix` documents them.
+`pkgs/build-sbt-project/default.nix` documents them.
 Path sources are filtered during evaluation. A source produced by a
 derivation remains a build input, so evaluating the builder does not build
 it. Prepare that source in its producing derivation; `srcFilter` applies
@@ -369,12 +371,15 @@ purifier from that package set or pass a compatible toolchain to the builder.
 sbt-purifier prefetch
 ```
 
-realizes every download the lockfile lists, and the JDK of its Java
-major, in the Nix store, with garbage-collector roots beside the lockfile
+realizes every download the lockfile lists in the Nix store, with
+garbage-collector roots beside the lockfile
 (`sbt-purifier.lock.json.gcroot*`). The downloads include sbt itself, the
 plugins of every level of the build, compiler bridges, and the sources
 and javadoc jars an editor asks for. After a prefetch, sbt and the
 everyday loop work with the network cut off.
+
+Offline sandboxed project builds also need the selected `jdk` and its
+closure in the Nix store. SDK selection for those builds is described above.
 
 In interactive mode, the wrapper boots sbt from the locked downloads, and
 the plugin realizes the lockfile through Nix (one garbage-collector root,

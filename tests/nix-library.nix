@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 #
-# Unit tests of the Nix library (nix/lib) on hand-written lockfiles. The
+# Unit tests of the public Nix library and package helpers on hand-written lockfiles. The
 # fetcher is replaced by one that writes each URL into a file, so nothing
 # downloads. The check fails with the list of failed tests.
 {
@@ -56,7 +56,7 @@ let
     ];
     flakeRepositories = [ ];
     inputsHash = "inputs";
-    definitionHash = import ../nix/lib/definition-hash.nix sourceTree;
+    definitionHash = import ../lib-overlays/default/definition-hash.nix sourceTree;
     artifacts = [
       {
         path = "https/repo.example/a/b/b-1.0.jar";
@@ -148,7 +148,8 @@ let
     }
   );
 
-  nameOf = fileName: (import ../nix/lib/fetch.nix { }).nameOf { path = "https/h/${fileName}"; };
+  nameOf =
+    fileName: (import ../pkgs/plugin/nix/fetch.nix { }).nameOf { path = "https/h/${fileName}"; };
 
   problemsOf = args: (readLock args).problems;
 

@@ -18,7 +18,9 @@ let
     "flake.lock"
     "project"
     "src"
-    "nix"
+    "lib-overlays"
+    "pkgs"
+    "tools"
     "sbt-purifier.lock.json"
   ];
 in
@@ -36,7 +38,7 @@ in
 }).packages.root.overrideAttrs
   (
     finalAttrs: previousAttrs: {
-      version = (import ./source-version.nix root).version;
+      version = (import ./nix/source-version.nix root).version;
       # A publisher can override `version` explicitly. The sbt build must publish
       # that exact value, rather than recomputing a development version inside it.
       SBT_NIX_BACKEND_RELEASE_VERSION = finalAttrs.version;

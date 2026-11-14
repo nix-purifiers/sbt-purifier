@@ -61,7 +61,7 @@ let
     if pin != null then
       pkgs.sbt-purifier.buildSbtProject
     else
-      pkgs.callPackage ./build-sbt-project.nix {
+      pkgs.callPackage ../../build-sbt-project {
         inherit (lib) purifier;
         inherit (lib.sbt-purifier) readLock;
       };

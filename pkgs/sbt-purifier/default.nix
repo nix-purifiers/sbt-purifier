@@ -10,7 +10,7 @@
 #                          dynamic versions included, lock every flake
 #                          repository at the newest revision of its
 #                          reference, and relock
-#   sbt-purifier prefetch  realize every locked download and the JDK in
+#   sbt-purifier prefetch  realize every locked download in
 #                          the Nix store, with garbage-collector roots
 #                          beside the lockfile, so sbt and an editor work
 #                          offline
@@ -27,7 +27,17 @@
   implementation,
 }:
 let
-  nixLib = ../../nix/lib;
+  nixLib = ../../lib-overlays/default;
+  # dependencies.nix imports the lock reader from lib-overlays/default by a
+  # relative path, so both directories go to the store at their places in
+  # the repository.
+  dependencySource = lib.fileset.toSource {
+    root = ../..;
+    fileset = lib.fileset.unions [
+      nixLib
+      ../plugin/nix
+    ];
+  };
 in
 writeShellScriptBin "sbt-purifier" ''
   set -euo pipefail
@@ -104,14 +114,11 @@ writeShellScriptBin "sbt-purifier" ''
       ;;
     prefetch)
       check
-      major=$(sed -n 's/^  "javaVersion": "\([0-9]*\)",$/\1/p' "$lockfile")
       nix-build --expr \
-        '{ lockFile, major }: let pkgs = import ${pkgs.path} { }; in [
-          (pkgs.callPackage ${nixLib}/dependencies.nix { lockFile = /. + lockFile; })
-          pkgs.javaPackages.compiler."openjdk''${major}".headless
-        ]' \
-        --argstr lockFile "$lockfile" --argstr major "$major" --out-link "$lockfile.gcroot"
-      echo "sbt-purifier: every download of $lockfile, and the JDK, are in the Nix store; $lockfile.gcroot* keep them" >&2
+        '{ lockFile }: let pkgs = import ${pkgs.path} { }; in
+          pkgs.callPackage ${dependencySource}/pkgs/plugin/nix/dependencies.nix { lockFile = /. + lockFile; }' \
+        --argstr lockFile "$lockfile" --out-link "$lockfile.gcroot"
+      echo "sbt-purifier: every download of $lockfile is in the Nix store; $lockfile.gcroot keeps them" >&2
       ;;
     publish)
       check
