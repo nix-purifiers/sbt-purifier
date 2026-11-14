@@ -442,6 +442,49 @@ in
   independent-sample-offline-tasks = independent.offline;
   sbt2-tests = sbt2.tests;
 
+  # Capture task-scoped tool dependencies used by an isolated runtime loader.
+  tool-classpath-runtime =
+    (buildSbtProject {
+      src = ./fixtures/tool-classpath;
+      pluginRepository = plugin-repository;
+      doCheck = true;
+    }).tests;
+
+  # The native plugin loads its engines dynamically. Exercise both the
+  # HOCON-included default and a task-scoped override without formatting files.
+  scalafmt-session =
+    let
+      project = buildSbtProject {
+        src = ./fixtures/scalafmt-session;
+        pluginRepository = plugin-repository;
+        doCheck = true;
+      };
+      command = "nixSandboxBuild --test scalafmt-session";
+    in
+    project.packages.scalafmt-session.overrideAttrs (original: {
+      buildPhase =
+        assert lib.hasInfix command original.buildPhase;
+        builtins.replaceStrings [ command ] [ ";scalafmtCheckAll;scalafmtSbtCheck;${command}" ]
+          original.buildPhase;
+    });
+
+  # MiMa resolves previous releases outside the current project's classpath.
+  # Load the returned JAR through an isolated loader in the pure build.
+  mima-session =
+    let
+      project = buildSbtProject {
+        src = ./fixtures/mima-session;
+        pluginRepository = plugin-repository;
+        doCheck = true;
+      };
+      command = "nixSandboxBuild --test mima-session";
+    in
+    project.packages.mima-session.overrideAttrs (original: {
+      buildPhase =
+        assert lib.hasInfix command original.buildPhase;
+        builtins.replaceStrings [ command ] [ ";verifyPrevious;${command}" ] original.buildPhase;
+    });
+
   nix-library = import ./nix-library.nix { inherit pkgs overlay flakeLib; };
 
   # Feature 1: the coursier cache of the multi fixture.
