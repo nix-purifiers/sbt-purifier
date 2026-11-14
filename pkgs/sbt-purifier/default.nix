@@ -28,6 +28,16 @@
 }:
 let
   nixLib = ../../lib-overlays/default;
+  # dependencies.nix imports the lock reader from lib-overlays/default by a
+  # relative path, so both directories go to the store at their places in
+  # the repository.
+  dependencySource = lib.fileset.toSource {
+    root = ../..;
+    fileset = lib.fileset.unions [
+      nixLib
+      ../plugin/nix
+    ];
+  };
 in
 writeShellScriptBin "sbt-purifier" ''
   set -euo pipefail
@@ -106,7 +116,7 @@ writeShellScriptBin "sbt-purifier" ''
       check
       nix-build --expr \
         '{ lockFile }: let pkgs = import ${pkgs.path} { }; in
-          pkgs.callPackage ${nixLib}/dependencies.nix { lockFile = /. + lockFile; }' \
+          pkgs.callPackage ${dependencySource}/pkgs/plugin/nix/dependencies.nix { lockFile = /. + lockFile; }' \
         --argstr lockFile "$lockfile" --out-link "$lockfile.gcroot"
       echo "sbt-purifier: every download of $lockfile is in the Nix store; $lockfile.gcroot keeps them" >&2
       ;;

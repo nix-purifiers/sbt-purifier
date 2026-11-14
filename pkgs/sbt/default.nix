@@ -51,6 +51,16 @@ let
     url = "https://scala.jfrog.io/artifactory/api/download/ivy-releases/org.scala-sbt/sbt-launch/0.13.18/jars/sbt-launch.jar";
     hash = "sha256-ZvklAnUM2fxS3RAg071BQK+ptYC9I6dGMrP/RMxzqbI=";
   };
+  # dependencies.nix imports the lock reader from lib-overlays/default by a
+  # relative path, so both directories go to the store at their places in
+  # the repository.
+  dependencySource = lib.fileset.toSource {
+    root = ../..;
+    fileset = lib.fileset.unions [
+      ../../lib-overlays/default
+      ../plugin/nix
+    ];
+  };
   # The directory name changes with the plugin, so a new plugin version
   # never meets the old one's resolution in target/.
   dirName = "global-plugins-" + builtins.substring 11 32 (toString inject);
@@ -145,7 +155,7 @@ writeTextFile {
       if [ -n "$locked" ] && [ "$locked" = "$wanted" ] && [ "$format" = "${toString (import ../../lib-overlays/default/lock-version.nix)}" ]; then
         mkdir -p target/sbt-nix-backend/gcroots
         if tree=$(nix-build --expr \
-          '{ lockFile }: (import ${pkgs.path} { }).callPackage ${../plugin/nix}/dependencies.nix { inherit lockFile; }' \
+          '{ lockFile }: (import ${pkgs.path} { }).callPackage ${dependencySource}/pkgs/plugin/nix/dependencies.nix { inherit lockFile; }' \
           --arg lockFile "$(realpath "$lockfile")" --out-link target/sbt-nix-backend/gcroots/boot-cache); then
           export SBT_NIX_BACKEND_USER_COURSIER_CACHE="''${COURSIER_CACHE:-}"
           export COURSIER_CACHE="$tree"
