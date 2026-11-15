@@ -2,6 +2,6 @@
 # of this sbt-purifier pins. In the repository, the flake.lock is at the
 # root; the plugin jar carries a copy of it beside the Nix library.
 let
-  lockFile = if builtins.pathExists ./flake.lock then ./flake.lock else ../../flake.lock;
+  lockFile = ../../../flake.lock;
 in
 builtins.fetchTree (builtins.fromJSON (builtins.readFile lockFile)).nodes.purifier.locked

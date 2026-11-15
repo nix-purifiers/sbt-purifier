@@ -3,7 +3,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-spec = importlib.util.spec_from_file_location("mode", Path(__file__).parents[1] / "nix/lib/implementation-mode.py")
+spec = importlib.util.spec_from_file_location("mode", Path(__file__).parents[1] / "pkgs/sbt/implementation-mode.py")
 mode = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mode)
 

@@ -9,11 +9,11 @@ through the store. The README describes what it does for a user.
 
 - The sbt plugin (`src/main/scala`): the lock run, the sandbox command,
   interactive mode, flake repositories, and the keys.
-- The Nix library (`nix/lib`), whose builder the flake overlay adds to a
+- The public Nix library (`lib-overlays/default`) and package helpers (`pkgs`), whose builder the flake overlay adds to a
   package set as `buildSbtProject`, for `callPackage`. The plugin jar carries the same
   files, so the code that builds a lockfile always comes from the plugin
   revision that wrote it.
-- The lockfile format (`Lock.scala`, `nix/lib/lock.nix`), versioned by its
+- The lockfile format (`Lock.scala`, `lib-overlays/default/read-lock.nix`), versioned by its
   `version` field.
 - The `sbt` wrapper (`pkgs/sbt`), which loads the plugin as a global
   plugin and boots sbt from the lock.

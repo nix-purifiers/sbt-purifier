@@ -115,7 +115,7 @@ let
     );
 
   filteredSrc =
-    if import ./source-readable.nix src then
+    if import ../../lib-overlays/default/source-readable.nix src then
       builtins.path {
         path = src;
         name = "sbt-source";
@@ -206,7 +206,7 @@ let
             resolvers += MavenRepository("sbt-nix-backend-plugin", "file://${repo}")
             addSbtPlugin("${p.organization}" % "${p.name}" % "${p.version}")
           ''
-          + lib.optionalString legacy (builtins.readFile ./legacy-global-settings.sbt)
+          + lib.optionalString legacy (builtins.readFile ../sbt/legacy-global-settings.sbt)
         );
         # An sbt plugin publishes as <name>_<scala>_<sbt> in Maven layout.
         # The check runs in the build rather than at evaluation, which

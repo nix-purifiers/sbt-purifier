@@ -5,7 +5,7 @@ The tests come in three layers, fastest first.
 1. **Scala unit tests** (`src/test/scala`, munit) cover the JSON codec, the
    coursier path mapping, the lockfile and its hashes, the build copy, the
    linked cache, POM coordinates, and that the jar carries all of
-   `nix/lib`. `sbt test` runs them, and so does the plugin's Nix build.
+   the `pkgs/plugin/resources.tsv` manifest. `sbt test` runs them, and so does the plugin's Nix build.
 2. **Flake checks** (`tests/default.nix`) run in the sandbox under
    `nix flake check`:
    - `plugin` builds the plugin from its own lockfile, unit tests included.

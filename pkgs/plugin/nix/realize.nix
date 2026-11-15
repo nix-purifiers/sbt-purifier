@@ -13,15 +13,18 @@
 # valid once `fetches` is built, so nothing downloads twice.
 {
   lockFile,
-  libDir ? ./.,
+  libDir ? null,
 }:
 let
   # The plugin realizes a lock it has checked; only the downloads count.
-  read = import (libDir + "/read-lock.nix") {
-    src = null;
-    inherit lockFile;
-  };
-  fetcher = import (libDir + "/fetch.nix") { };
+  read =
+    import
+      (if libDir == null then ../../../lib-overlays/default/read-lock.nix else libDir + "/read-lock.nix")
+      {
+        src = null;
+        inherit lockFile;
+      };
+  fetcher = import (if libDir == null then ./fetch.nix else libDir + "/fetch.nix") { };
   byPath =
     f:
     builtins.listToAttrs (

@@ -121,7 +121,7 @@ object LockGeneration {
       val target = new File(dir, "sbt-nix-backend.sbt")
       Files.copy(f.toPath, target.toPath)
       if (BootRepositories.legacy(in.sbtVersion) && !new String(Files.readAllBytes(target.toPath), StandardCharsets.UTF_8).contains("// Bootstrap the global plugin"))
-        Files.write(target.toPath, NixLibrary.resource("legacy-global-settings.sbt"), StandardOpenOption.APPEND)
+        Files.write(target.toPath, NixLibrary.resource("pkgs/sbt/legacy-global-settings.sbt"), StandardOpenOption.APPEND)
       dir
     }
 

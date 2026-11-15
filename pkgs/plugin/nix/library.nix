@@ -7,7 +7,7 @@ lib.extend (
   final: prev: {
     purifier = import (import ./purifier-source.nix) { lib = final; };
     sbt-purifier = {
-      readLock = import ./read-lock.nix;
+      readLock = import ../../../lib-overlays/default/read-lock.nix;
     };
   }
 )

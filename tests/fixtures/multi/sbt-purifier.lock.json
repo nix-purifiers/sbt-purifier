@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "contentHash": "d435ce4a4fe2701c12d8614a496ba6550cf88907b15ea4dd6107a9c5f2806666",
+  "contentHash": "28afe6a3fad7635d70adc8d8e1cea99dd92a400bd97a2b19d3b495abd93c0b42",
   "sbtVersion": "1.13.1",
   "javaVersion": "21",
   "launcher": "https/repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.13.1/sbt-launch-1.13.1.jar",
@@ -11,7 +11,7 @@
   "plugin": {
     "organization": "io.github.clhodapp",
     "name": "sbt-nix-backend",
-    "version": "0.0.0-dev.600dd40fbe8abd6bbcbccb6b7531ee2d448efee33b3310537f38f4519bf7fa07",
+    "version": "0.0.0-dev.7b9e6b553c43bc0473e5e6bcdffbdb1f314131bf6ac3a8388cb99e9500de6afa",
     "via": "global-plugin"
   },
   "projects": [
@@ -188,7 +188,7 @@
     }
   ],
   "flakeRepositories": [],
-  "inputsHash": "f29e50e8f8fadded6b71f6a16c79b15dd8c5c4e0d11c2522c53d8773ebefb8ae",
+  "inputsHash": "7c35ad68030cb9d951cfb6208dc156864ed8476dfde69529a3917e1b2ba70a1b",
   "definitionHash": "59e9fe0a60e5bef18d3012607404e56fb4482b25b461dabf33afcbc61b1c1673",
   "artifacts": [
     {

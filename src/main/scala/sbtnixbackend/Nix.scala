@@ -53,7 +53,7 @@ final class Nix(log: String => Unit) {
     Option(outLink.getParentFile).foreach(_.mkdirs())
     val arguments = Seq(
       "--file",
-      new File(library, "project-repository.nix").getAbsolutePath,
+      new File(library, "pkgs/build-sbt-project/project-repository.nix").getAbsolutePath,
       "--argstr",
       "locked",
       locked,

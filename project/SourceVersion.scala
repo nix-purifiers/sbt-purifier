@@ -4,9 +4,9 @@ import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.Files
 import java.security.MessageDigest
 
-/** Keep the manifest format and inputs identical to nix/lib/source-version.nix. */
+/** Keep the manifest format and inputs identical to pkgs/plugin/nix/source-version.nix. */
 object SourceVersion {
-  private val parts = Seq("build.sbt", "flake.lock", "project", "src", "nix", "sbt-purifier.lock.json")
+  private val parts = Seq("build.sbt", "flake.lock", "project", "src", "lib-overlays", "pkgs", "tools", "sbt-purifier.lock.json")
   private def sha(bytes: Array[Byte]): String =
     MessageDigest.getInstance("SHA-256").digest(bytes).map(b => f"${b & 255}%02x").mkString
 
